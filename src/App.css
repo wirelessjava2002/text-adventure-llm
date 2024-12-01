@@ -73,7 +73,6 @@ body {
 
 .chat-window {
     flex: 1; /* Allow chat window to take available space */
-    max-height: 400px; /* Limit height of chat window */
     overflow-y: auto; /* Enable scrolling */
     margin-bottom: 20px; /* Space below chat window */
     background-color: #2a2a2a; /* Slightly lighter grey for chat window */
