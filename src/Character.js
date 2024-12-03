@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Inventory from './Inventory';
 import Dice from './Dice';
+import CharacterPortrait from './CharacterPortrait'; // Import the new component
 
 const Character = ({ characterStats, setCharacterStats }) => {
     const [diceRoll, setDiceRoll] = useState(null);
     const [rolling, setRolling] = useState(false);
+    const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0); // State for current portrait index
+    const totalPortraits = 14; // Total number of portraits
 
     // Function to reroll the ability stats
     const rollStats = () => {
@@ -33,6 +36,17 @@ const Character = ({ characterStats, setCharacterStats }) => {
             setDiceRoll(result);
             setRolling(false);
         }, 1000);
+    };
+
+    // Function to change the portrait
+    const changePortrait = (direction) => {
+        setCurrentPortraitIndex((prevIndex) => {
+            if (direction === 'left') {
+                return (prevIndex - 1 + totalPortraits) % totalPortraits; // Wrap around to the last portrait
+            } else {
+                return (prevIndex + 1) % totalPortraits; // Wrap around to the first portrait
+            }
+        });
     };
 
     useEffect(() => {
@@ -76,6 +90,11 @@ const Character = ({ characterStats, setCharacterStats }) => {
                                 <li><strong>Hit Die (HD):</strong> {characterStats.hitDie}</li>
                             </ul>
                         </div>
+                        {/* Character Portrait Section */}
+                        <CharacterPortrait 
+                            currentPortraitIndex={currentPortraitIndex} 
+                            changePortrait={changePortrait} 
+                        />
                     </div>
                     <div className="right-column">
                         <Inventory />
