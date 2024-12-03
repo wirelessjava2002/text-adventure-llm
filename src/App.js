@@ -116,7 +116,9 @@ function App() {
         <div className="chat-window">
           {messages.map((msg, index) => (
             <div key={index} className={msg.sender === 'User' ? 'user-message' : msg.sender === 'Dice' ? 'dice-message' : 'gemini-message'}>
-              <strong>{msg.sender}:</strong> {msg.text}
+              <div>
+                <strong>{msg.sender}:</strong> {msg.text}
+              </div>
             </div>
           ))}
           <div ref={endOfMessagesRef}></div>

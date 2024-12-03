@@ -78,32 +78,54 @@ body {
     background-color: #2a2a2a; /* Slightly lighter grey for chat window */
     border-radius: 5px; /* Rounded corners */
     padding: 10px; /* Padding inside chat window */
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack messages vertically */
 }
 
 .user-message, .gemini-message, .dice-message {
-    font-size: 20px; /* Set font size for chat messages */
-    line-height: 1.5; /* Improve line height for readability */
-}
-
-.user-message {
-    background-color: #3a3a3a; /* Darker grey for user messages */
-    border-radius: 5px;
-    padding: 10px;
-    margin: 5px 0;
+    width: 100%; /* Ensure the message container takes full width */
+    margin: 5px 0; /* Space between messages */
 }
 
 .gemini-message {
-    background-color: #4a4a4a; /* Darker grey for GM messages */
-    border-radius: 5px;
-    padding: 10px;
-    margin: 5px 0;
+    align-self: flex-start; /* Left justify */
+}
+
+.user-message {
+    align-self: flex-end; /* Right justify */
+    color: white; /* White text for contrast */
+}
+
+.chat-window .gemini-message > div {
+    background-color: #3a3a3a; /* Darker gray for GM messages */
+    color: white; /* White text for contrast */
+    padding: 10px; /* Padding inside messages */
+    border-radius: 5px; /* Rounded corners */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+    text-align: left; /* Left justify text for GM */
+}
+
+.chat-window .user-message > div {
+    background-color: #2e2e2e; /* Dark gray for user messages */
+    color: white; /* White text for contrast */
+    padding: 10px; /* Padding inside messages */
+    border-radius: 5px; /* Rounded corners */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+    text-align: right; /* Right justify text for User */
 }
 
 .dice-message {
-    background-color: #5a5a5a; /* Darker grey for dice messages */
-    border-radius: 5px;
-    padding: 10px;
-    margin: 5px 0;
+    align-self: flex-start; /* Left justify */
+}
+
+.dice-message > div {
+    background-color: #5a5a5a; /* Darker gray for dice messages */
+    padding: 10px; /* Padding inside messages */
+    border-radius: 5px; /* Rounded corners */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .input-form {
