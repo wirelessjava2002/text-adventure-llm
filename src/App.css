@@ -407,8 +407,9 @@ button:hover {
 }
 
 .portrait-image {
-    width: 100px; /* Set a fixed width for the portrait */
+    width: 100%; /* Set the image width to 100% of its container */
     height: auto; /* Maintain aspect ratio */
+    max-width: 200px; /* Optional: Set a max width to prevent it from being too large */
     margin-bottom: 10px; /* Space between the image and buttons */
 }
 

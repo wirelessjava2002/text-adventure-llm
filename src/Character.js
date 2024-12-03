@@ -59,6 +59,10 @@ const Character = ({ characterStats, setCharacterStats }) => {
                 <h2>{characterStats.name}</h2>
                 <div className="character-container">
                     <div className="left-column">
+                    <CharacterPortrait 
+                            currentPortraitIndex={currentPortraitIndex} 
+                            changePortrait={changePortrait} 
+                        />
                         <div className="character-attributes">
                             <h3>Character Attributes</h3>
                             <p><strong>Name:</strong> {characterStats.name}</p>
@@ -67,7 +71,18 @@ const Character = ({ characterStats, setCharacterStats }) => {
                             <p><strong>Race:</strong> Human</p>
                             <p><strong>Alignment:</strong> Neutral Good</p>
                         </div>
-                        <div className="ability-scores">
+                        <div className="combat-stats">
+                            <h3>Combat Stats</h3>
+                            <ul>
+                                <li><strong>Armor Class (AC):</strong> {characterStats.armorClass}</li>
+                                <li><strong>Initiative:</strong> {characterStats.initiative}</li>
+                                <li><strong>Hit Points (HP):</strong> {characterStats.hitPoints}</li>
+                                <li><strong>Hit Die (HD):</strong> {characterStats.hitDie}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="right-column">
+                    <div className="ability-scores">
                             <h3>Ability Scores</h3>
                             <ul>
                                 <li><strong>Strength:</strong> {characterStats.strength}</li>
@@ -81,22 +96,6 @@ const Character = ({ characterStats, setCharacterStats }) => {
                             {/* ReRoll Button */}
                             <button onClick={rollStats} className="roll-stats-button small-button">ReRoll</button>
                         </div>
-                        <div className="combat-stats">
-                            <h3>Combat Stats</h3>
-                            <ul>
-                                <li><strong>Armor Class (AC):</strong> {characterStats.armorClass}</li>
-                                <li><strong>Initiative:</strong> {characterStats.initiative}</li>
-                                <li><strong>Hit Points (HP):</strong> {characterStats.hitPoints}</li>
-                                <li><strong>Hit Die (HD):</strong> {characterStats.hitDie}</li>
-                            </ul>
-                        </div>
-                        {/* Character Portrait Section */}
-                        <CharacterPortrait 
-                            currentPortraitIndex={currentPortraitIndex} 
-                            changePortrait={changePortrait} 
-                        />
-                    </div>
-                    <div className="right-column">
                         <Inventory />
                         <div className="roll-dice-container">
                             <h3>Dice</h3>
