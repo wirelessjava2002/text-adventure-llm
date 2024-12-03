@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 import Character from './Character';
+import parseExperiencePoints from './utils/parseExperiencePoints'; 
+import parseResponse from './utils/parseResponse';
+
 
 function App() {
   const [input, setInput] = useState('');
@@ -15,7 +18,7 @@ function App() {
   const genAI = new GoogleGenerativeAI(process.env.API_KEY);    
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const initialContextPrompt = "You are a Dungeon Master in a fantasy game setting using the D20 rules system. Guide the players through their adventure and respond in character with one or 2 scentance responses. You must stay in charactter at all times. Intermittently award the player experience points when they achieve anything in the game, like killing a monster or finding an item";
+  const initialContextPrompt = "You are a Dungeon Master in a fantasy game setting using the D20 rules system. Guide the players through their adventure and respond in character with one or 2 scentance responses. You must stay in charactter at all times. Intermittently award player EXP in the format number then the words 'experience points' when they achieve anything in the game, like killing a monster or finding an item";
 
   const [characterStats, setCharacterStats] = useState({
     name: "Adventurer",
@@ -28,7 +31,8 @@ function App() {
     armorClass: 16,
     initiative: 2,
     hitPoints: 20,
-    hitDie: "1d8"
+    hitDie: "1d8",
+    experiencePoints: 0 
   });
 
   useEffect(() => {
@@ -65,26 +69,27 @@ function App() {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     try {
-        // Create a context string from the messages array
         const contextMessages = messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
-        
-        // Include the initial context prompt and the user's message
         const fullMessage = `${initialContextPrompt}\n${contextMessages}\nUser: ${input}`;
 
         const response = await axios.post('http://localhost:5000/api/chat', {
-            message: fullMessage // Send the full context to the API
+            message: fullMessage
         });
 
         const geminiMessage = { sender: 'GM', text: response.data.reply };
         setMessages((prevMessages) => [...prevMessages, geminiMessage]);
+
+        // Call parseResponse with updated state
+        parseResponse(response.data.reply, setCharacterStats, characterStats);
+
     } catch (error) {
         console.error('Error communicating with Gemini:', error);
-        const errorMessage = { sender: 'GM', text: 'Error: Unable to get a response.' };
-        setMessages((prevMessages) => [...prevMessages, errorMessage]);
+        setMessages((prevMessages) => [...prevMessages, { sender: 'GM', text: 'Error: Unable to get a response.' }]);
     }
 
     setInput('');
-  };
+};
+
 
   const rollDice = () => {
     setRolling(true);
@@ -95,6 +100,10 @@ function App() {
       setRolling(false);
     }, 1000);
   };
+
+// In App.js, make sure you're passing setCharacterStats as a prop
+<Character characterStats={characterStats} setCharacterStats={setCharacterStats} />
+
 
   return (
     <div className="App">

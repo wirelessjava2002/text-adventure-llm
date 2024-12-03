@@ -1,34 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Inventory from './Inventory';
 import Dice from './Dice';
 
-const Character = () => {
-    const [characterStats, setCharacterStats] = useState({
-        name: "Adventurer",
-        strength: 15,
-        dexterity: 12,
-        constitution: 14,
-        intelligence: 15,
-        wisdom: 13,
-        charisma: 10,
-        armorClass: 16,
-        initiative: 2,
-        hitPoints: 20,
-        hitDie: "1d8"
-    });
-
-    const [characterAttributes] = useState({
-        name: "Player1",
-        class: "Warrior",
-        level: 1,
-        race: "Human",
-        alignment: "Neutral Good"
-    });
-
+const Character = ({ characterStats, setCharacterStats }) => {
     const [diceRoll, setDiceRoll] = useState(null);
     const [rolling, setRolling] = useState(false);
-    const [currentInput, setCurrentInput] = useState("");
 
+    // Function to reroll the ability stats
     const rollStats = () => {
         const newStats = {
             strength: Math.floor(Math.random() * 16) + 5,
@@ -38,9 +16,11 @@ const Character = () => {
             wisdom: Math.floor(Math.random() * 16) + 5,
             charisma: Math.floor(Math.random() * 16) + 5,
         };
+
+        // Use setCharacterStats passed from App.js to update the stats
         setCharacterStats((prevStats) => ({
-            ...prevStats,
-            ...newStats,
+            ...prevStats, // Spread the previous stats
+            ...newStats, // Apply the new stats to update only the ability scores
         }));
     };
 
@@ -55,6 +35,10 @@ const Character = () => {
         }, 1000);
     };
 
+    useEffect(() => {
+        console.log('Character Stats in Character.js updated:', characterStats);
+    }, [characterStats]);  // This will trigger when characterStats changes
+
     return (
         <div className="adventurer-panel">
             <div className="character">
@@ -63,11 +47,11 @@ const Character = () => {
                     <div className="left-column">
                         <div className="character-attributes">
                             <h3>Character Attributes</h3>
-                            <p><strong>Name:</strong> {characterAttributes.name}</p>
-                            <p><strong>Class:</strong> {characterAttributes.class}</p>
-                            <p><strong>Level:</strong> {characterAttributes.level}</p>
-                            <p><strong>Race:</strong> {characterAttributes.race}</p>
-                            <p><strong>Alignment:</strong> {characterAttributes.alignment}</p>
+                            <p><strong>Name:</strong> {characterStats.name}</p>
+                            <p><strong>Class:</strong> Warrior</p>
+                            <p><strong>Level:</strong> 1</p>
+                            <p><strong>Race:</strong> Human</p>
+                            <p><strong>Alignment:</strong> Neutral Good</p>
                         </div>
                         <div className="ability-scores">
                             <h3>Ability Scores</h3>
@@ -78,7 +62,9 @@ const Character = () => {
                                 <li><strong>Intelligence:</strong> {characterStats.intelligence}</li>
                                 <li><strong>Wisdom:</strong> {characterStats.wisdom}</li>
                                 <li><strong>Charisma:</strong> {characterStats.charisma}</li>
+                                <p><strong>Experience:</strong> {characterStats.experiencePoints}</p>
                             </ul>
+                            {/* ReRoll Button */}
                             <button onClick={rollStats} className="roll-stats-button small-button">ReRoll</button>
                         </div>
                         <div className="combat-stats">
