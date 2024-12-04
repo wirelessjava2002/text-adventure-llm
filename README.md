@@ -43,6 +43,11 @@ To get started with the Text Adventure Game, follow these steps:
 5. **Open Your Browser**:
    Navigate to `http://localhost:3000` to start playing!
 
+6. **On Push Pipeline Deploy**:
+   `https://text-adventure-llm.onrender.com/`
+
+   https://dashboard.render.com/
+
 ## 🎮 Usage
 
 Once the application is running, you can start your adventure by typing commands into the input box at the bottom of the screen. The game will respond with text-based narratives and options based on your input.
