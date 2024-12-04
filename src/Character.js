@@ -51,7 +51,8 @@ const Character = ({ characterStats, setCharacterStats }) => {
 
     useEffect(() => {
         console.log('Character Stats in Character.js updated:', characterStats);
-    }, [characterStats]);  // This will trigger when characterStats changes
+        console.log('Set character Stats in Character.js updated:', setCharacterStats);
+    }, [characterStats, setCharacterStats]);  // This will trigger when characterStats changes
 
     return (
         <div className="adventurer-panel">

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 import Character from './Character';
-import parseExperiencePoints from './utils/parseExperiencePoints'; 
 import parseResponse from './utils/parseResponse';
 
 
@@ -39,7 +38,7 @@ function App() {
     const initializeGame = async () => {
       if (!isInitialized) {
         try {
-          const response = await axios.post('http://localhost:5000/api/chat', {
+          const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, {
             message: `${initialContextPrompt} Describe the setting for the adventure.`
           });
           const initialSetting = { sender: 'GM', text: response.data.reply };
@@ -72,7 +71,7 @@ function App() {
         const contextMessages = messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
         const fullMessage = `${initialContextPrompt}\n${contextMessages}\nUser: ${input}`;
 
-        const response = await axios.post('http://localhost:5000/api/chat', {
+        const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, {
             message: fullMessage
         });
 
