@@ -107,7 +107,7 @@ function App() {
   return (
     <div className="App">
       <div className="left-panel">
-        <h1>Game Master</h1>
+        <h1>Game Master  v1</h1>
         <p>Welcome to the Text Adventure Game! Here you can find instructions and lore.</p>
         <Character characterStats={characterStats} messages={messages} sendMessage={handleSubmit} />
       </div>
