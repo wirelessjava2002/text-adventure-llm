@@ -111,8 +111,8 @@ function App() {
   return (
     <div className="App">
       <div className="left-panel">
-        <h1>Text Adventure</h1>
-        <p>Welcome to the Text Adventure Game! Here you can find instructions and lore.</p>
+        <h1>Lands of Eldoria</h1>
+        <p>Welcome brave adventurer, please be patient as this is a <strong>free server</strong>, so may take an age to spin up when idle. Hit refresh, grab an Ale, come back and enjoy!🍺</p>
         <Character characterStats={characterStats} setCharacterStats={setCharacterStats}/>
       </div>
       <div className="right-panel">

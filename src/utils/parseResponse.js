@@ -1,5 +1,6 @@
 // src/utils/parseResponse.js
 import parseExperiencePoints from './parseExperiencePoints';
+import calculateLevel from './levelUp';
 
 const parseResponse = (responseText, setCharacterStats, prevStats) => {
     const experiencePoints = parseExperiencePoints(responseText);
@@ -10,7 +11,8 @@ const parseResponse = (responseText, setCharacterStats, prevStats) => {
             // Update experience points by adding the parsed value
             const updatedStats = {
                 ...prevStats,
-                experiencePoints: prevStats.experiencePoints + experiencePoints
+                experiencePoints: prevStats.experiencePoints + experiencePoints,
+                level: calculateLevel(prevStats.experiencePoints + experiencePoints) // Update level based on new experience points
             };
             console.log("Updated Stats:", updatedStats); // Log the updated stats here (after state update)
             return updatedStats;

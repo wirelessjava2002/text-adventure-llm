@@ -55,13 +55,6 @@ const Character = ({ characterStats, setCharacterStats }) => {
         console.log('Set character Stats in Character.js updated:', setCharacterStats);
     }, [characterStats, setCharacterStats]);  // This will trigger when characterStats changes
 
-    const updateExperiencePoints = (newExperiencePoints) => {
-        setCharacterStats((prevStats) => ({
-            ...prevStats,
-            experiencePoints: newExperiencePoints,
-            level: calculateLevel(newExperiencePoints), // Update level based on experience points
-        }));
-    };
 
     return (
         <div className="adventurer-panel">
@@ -77,7 +70,7 @@ const Character = ({ characterStats, setCharacterStats }) => {
                             <h3>Character Attributes</h3>
                             <p><strong>Name:</strong> {characterStats.name}</p>
                             <p><strong>Class:</strong> Warrior</p>
-                            <p><strong>Level:</strong> 1</p>
+                            <p><strong>Level:</strong> {characterStats.level}</p>
                             <p><strong>Race:</strong> Human</p>
                             <p><strong>Alignment:</strong> Neutral Good</p>
                         </div>
