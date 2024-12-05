@@ -7,6 +7,18 @@
   pointer-events: none;
 }
 
+.App-body {
+    display: flex;
+    flex: 1; /* Allow the body to take remaining height */
+    position: relative; /* To position the input box at the bottom */
+  }
+
+html, body {
+    height: 100%; /* Ensure full height */
+    overflow: hidden; /* Disable body scroll */
+  }
+  
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -72,6 +84,7 @@ body {
 }
 
 .chat-window {
+    flex-grow: 1; /* Make the chat window take all available space */
     flex: 1; /* Allow chat window to take available space */
     overflow-y: auto; /* Enable scrolling */
     margin-bottom: 20px; /* Space below chat window */
@@ -80,7 +93,8 @@ body {
     padding: 10px; /* Padding inside chat window */
     display: flex; /* Use flexbox for layout */
     flex-direction: column; /* Stack messages vertically */
-}
+    max-height: 80vh; /* Limit height so the chat window doesn't grow indefinitely */
+  }
 
 .user-message, .gemini-message, .dice-message {
     width: 100%; /* Ensure the message container takes full width */
@@ -131,34 +145,38 @@ body {
 .input-form {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Center items vertically */
-    position: absolute; /* Position the input form absolutely */
-    bottom: 20px; /* Space from the bottom */
-    left: 20px; /* Space from the left */
-    right: 20px; /* Space from the right */
-}
-
-.input-box {
-    flex: 1;
+    align-items: center;
+    position: absolute; /* Position at the bottom */
+    bottom: 20px; /* Adjust the distance from the bottom */
+    left: 20px;
+    right: 20px;
+    background-color: #1e1e1e; /* Same as panel background to blend */
     padding: 10px;
-    border: 1px solid #555; /* Dark border */
-    border-radius: 5px; /* Rounded corners */
-    margin-right: 10px; /* Space between input and button */
-}
-
-button {
+    border-radius: 5px;
+    z-index: 10; /* Ensure it stays on top of other elements */
+  }
+  
+  .input-box {
+    flex: 1; /* Allow input box to take available width */
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  button {
     padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
     border: none;
-    border-radius: 5px; /* Rounded corners */
-    background-color: #007bff; /* Bootstrap primary color */
-    color: white; /* White text */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth transition */
-}
-
-button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-}
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
 
 .rolling-dice {
     display: flex;
@@ -175,7 +193,7 @@ button:hover {
 .roll-button {
     padding: 20px 40px; /* Increase padding for a larger button */
     font-size: 28px; /* Increase font size for better visibility */
-    background-color: #4CAF50; /* Green background */
+    background-color: #8B4513; /* Brown background */
     color: white; /* White text color */
     border: none; /* Remove border */
     border-radius: 8px; /* Rounded corners */
@@ -186,7 +204,7 @@ button:hover {
 }
 
 .roll-button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #6B2A14; /* Darker brown on hover */
 }
 
 .character {
@@ -215,7 +233,7 @@ button:hover {
 .roll-stats-button {
     padding: 10px 20px; /* Padding for the button */
     font-size: 16px; /* Font size */
-    background-color: #4CAF50; /* Green background */
+    background-color: #8B4513; /* Brown background */
     color: white; /* White text */
     border: none; /* No border */
     border-radius: 5px; /* Rounded corners */
@@ -225,7 +243,7 @@ button:hover {
 }
 
 .roll-stats-button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #6B2A14; /* Darker brown on hover */
 }
 
 .inventory {
@@ -256,7 +274,7 @@ button:hover {
     margin-top: 10px; /* Space above the button */
     padding: 5px 10px; /* Padding for the button */
     font-size: 14px; /* Font size */
-    background-color: #4CAF50; /* Green background */
+    background-color: #8B4513; /* Brown background */
     color: white; /* White text */
     border: none; /* No border */
     border-radius: 5px; /* Rounded corners */
@@ -265,7 +283,7 @@ button:hover {
 }
 
 .add-item-button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #6B2A14; /* Darker brown on hover */
 }
 
 .character-attributes,
@@ -306,7 +324,7 @@ button:hover {
     margin-bottom: 10px; /* Space below the button */
     padding: 5px 10px; /* Padding for the button */
     font-size: 14px; /* Font size */
-    background-color: #4CAF50; /* Green background */
+    background-color: #8B4513; /* Brown background */
     color: white; /* White text */
     border: none; /* No border */
     border-radius: 5px; /* Rounded corners */
@@ -315,7 +333,7 @@ button:hover {
 }
 
 .roll-dice-button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #6B2A14; /* Darker brown on hover */
 }
 
 .dice-animation {
@@ -420,14 +438,15 @@ button:hover {
 }
 
 button {
-    background-color: #007bff; /* Button color */
-    color: white; /* Button text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    padding: 10px; /* Padding inside buttons */
-    cursor: pointer; /* Pointer cursor on hover */
+    padding: 10px 15px;
+    background-color: #8B4513; /* Brown color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #6B2A14; /* Darker brown on hover */
 }
