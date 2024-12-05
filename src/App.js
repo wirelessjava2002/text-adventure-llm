@@ -31,7 +31,8 @@ function App() {
     initiative: 2,
     hitPoints: 20,
     hitDie: "1d8",
-    experiencePoints: 0 
+    experiencePoints: 0,
+    level: 1
   });
 
   useEffect(() => {

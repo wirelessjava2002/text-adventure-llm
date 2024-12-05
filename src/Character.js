@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Inventory from './Inventory';
 import Dice from './Dice';
 import CharacterPortrait from './CharacterPortrait'; // Import the new component
+import calculateLevel from './utils/levelUp'; // Adjust the path as necessary
 
 const Character = ({ characterStats, setCharacterStats }) => {
     const [diceRoll, setDiceRoll] = useState(null);
@@ -53,6 +54,14 @@ const Character = ({ characterStats, setCharacterStats }) => {
         console.log('Character Stats in Character.js updated:', characterStats);
         console.log('Set character Stats in Character.js updated:', setCharacterStats);
     }, [characterStats, setCharacterStats]);  // This will trigger when characterStats changes
+
+    const updateExperiencePoints = (newExperiencePoints) => {
+        setCharacterStats((prevStats) => ({
+            ...prevStats,
+            experiencePoints: newExperiencePoints,
+            level: calculateLevel(newExperiencePoints), // Update level based on experience points
+        }));
+    };
 
     return (
         <div className="adventurer-panel">

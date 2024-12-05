@@ -96,3 +96,18 @@ For any inquiries, please reach out.
 ---
 
 Happy adventuring! May your quests be filled with excitement and discovery! 🧙‍♂️✨
+
+
+Example Dialogue:
+
+GM: The moan intensifies, a chilling wail that seems to emanate from the very stones themselves. A shadowy figure begins to take shape within the mist.
+User: talk to figure
+GM: The figure materializes fully, revealing a gaunt specter with eyes burning like embers. It speaks in a voice like rustling bones, "You have trespassed upon sacred ground."
+User: im sorry
+GM: The specter's gaze chills you to the bone, but its wrath seems to lessen slightly. Perhaps there is a way to appease this ancient guardian.
+User: i can tell a joke, the specter may like it
+GM: The specter lets out a rattling chuckle, a sound like stones grinding together. Perhaps humor can bridge even the gap between the living and the spectral realm.
+User: whats brown and sticky
+GM: The specter tilts its skeletal head, a flicker of something akin to amusement in its burning eyes. "I'll give you one guess, mortal."
+User: a stick?
+GM: The specter bursts into a cacophony of rattling laughter, a sound both chilling and strangely mirthful. "Indeed, mortal! You have proven yourself worthy." 200 experience points
