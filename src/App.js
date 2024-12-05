@@ -36,22 +36,28 @@ function App() {
 
   useEffect(() => {
     const initializeGame = async () => {
-      if (!isInitialized) {
-        try {
-          const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, {
-            message: `${initialContextPrompt} Describe the setting for the adventure.`
-          });
-          const initialSetting = { sender: 'GM', text: response.data.reply };
-          setMessages((prevMessages) => [...prevMessages, initialSetting]);
-          setIsInitialized(true);
-        } catch (error) {
-          console.error('Error initializing game:', error);
+        if (!isInitialized) {
+            try {
+                const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
+                  { message: `${initialContextPrompt} Describe the setting for the adventure.`},
+                  { headers: { 'client-id': 'AppInitialization' } }
+                );
+
+                const initialSetting = { sender: 'GM', text: response.data.reply };
+                setMessages((prevMessages) => [...prevMessages, initialSetting]);
+                setIsInitialized(true); // Ensures this runs only once
+                console.log('Request sent to backend engine:');
+            } catch (error) {
+                console.error('Error initializing game:', error);
+            }
         }
-      }
     };
 
     initializeGame();
-  }, [isInitialized]);
+}, [isInitialized]);
+
+
+
 
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,9 +77,10 @@ function App() {
         const contextMessages = messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
         const fullMessage = `${initialContextPrompt}\n${contextMessages}\nUser: ${input}`;
 
-        const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, {
-            message: fullMessage
-        });
+        const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
+          { message: fullMessage},
+          { headers: { 'client-id': 'AppInitialization' } }
+        );
 
         const geminiMessage = { sender: 'GM', text: response.data.reply };
         setMessages((prevMessages) => [...prevMessages, geminiMessage]);
@@ -100,16 +107,12 @@ function App() {
     }, 1000);
   };
 
-// In App.js, make sure you're passing setCharacterStats as a prop
-<Character characterStats={characterStats} setCharacterStats={setCharacterStats} />
-
-
   return (
     <div className="App">
       <div className="left-panel">
         <h1>Text Adventure</h1>
         <p>Welcome to the Text Adventure Game! Here you can find instructions and lore.</p>
-        <Character characterStats={characterStats} messages={messages} sendMessage={handleSubmit} />
+        <Character characterStats={characterStats} setCharacterStats={setCharacterStats}/>
       </div>
       <div className="right-panel">
         <div className="chat-window">
