@@ -4,8 +4,10 @@
  * @returns {number} - The updated level of the player.
  */
 const calculateLevel = (experiencePoints) => {
-    // Each level requires 500 experience points
-    const level = Math.floor(experiencePoints / 100);
+    // Each level requires 100 experience points
+    const level = Math.floor(experiencePoints / 275);
+    console.log("CalculateLevel experience points:", experiencePoints);
+    console.log("CalculateLevel:", level);
     return level;
 };
 
