@@ -111,8 +111,11 @@ function App() {
   return (
     <div className="App">
       <div className="left-panel">
-        <h1>Lands of Eldoria</h1>
-        <p>Welcome brave adventurer, please be patient as this is a <strong>free server</strong>, so may take an age to spin up when idle. Hit refresh, grab an Ale, come back and enjoy!🍺</p>
+        <div className="title-banner" style={{ backgroundImage: `url('/assets/fantasy-banner.png')` }}>
+          <h1>Lands of Eldoria</h1>
+          <h2>Party like it's 1984</h2>
+          <p>Welcome brave adventurer, please be patient as this is a <strong>free server</strong>, so may take an age to spin up when idle. Hit refresh, grab an Ale, come back and enjoy!🍺</p>
+        </div>
         <Character characterStats={characterStats} setCharacterStats={setCharacterStats}/>
       </div>
       <div className="right-panel">

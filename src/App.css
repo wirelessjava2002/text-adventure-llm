@@ -83,6 +83,25 @@ body {
     position: relative; /* Set position to relative for absolute positioning of input */
 }
 
+.title-banner {
+    background-size: cover; /* Ensures the image covers the area */
+    background-position: center; /* Centers the image */
+    border-radius: 8px; /* Optional: adds rounded corners */
+    padding: 20px; /* Adds some spacing inside */
+    text-align: center; /* Centers the text */
+    margin-bottom: 20px; /* Adds space below the banner */
+    text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.7); /* Adds a shadow around the text */
+    height: 200px; /* Adjust height as needed */
+}
+
+.title-banner h1 {
+    font-size: 4rem; /* Makes the h1 text larger */
+    color: white;
+    -webkit-text-stroke: 1px black; /* Adds a black border around the white text */
+    text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.7); /* Keeps the text shadow */
+    margin: 0; /* Remove any default margin */
+}
+
 .chat-window {
     flex-grow: 1; /* Make the chat window take all available space */
     flex: 1; /* Allow chat window to take available space */
@@ -118,6 +137,7 @@ body {
     width: 100%; /* Full width */
     box-sizing: border-box; /* Include padding in width calculation */
     text-align: left; /* Left justify text for GM */
+    font-size: larger;
 }
 
 .chat-window .user-message > div {
@@ -128,6 +148,7 @@ body {
     width: 100%; /* Full width */
     box-sizing: border-box; /* Include padding in width calculation */
     text-align: right; /* Right justify text for User */
+    font-size: larger;
 }
 
 .dice-message {
