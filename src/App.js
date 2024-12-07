@@ -46,7 +46,7 @@ function App() {
         if (!isInitialized) {
             try {
                 const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
-                  { message: `${initialContextPrompt} Describe the setting for the adventure.`},
+                  { message: `${initialContextPrompt} At the start, describe the setting for the adventure in great detail.`},
                   { headers: { 'client-id': 'AppInitialization' } }
                 );
 
@@ -142,7 +142,7 @@ function App() {
                 />
               )}
               <div>
-                
+
                 <strong>{msg.sender}:</strong> {msg.text}
               </div>
             </div>
