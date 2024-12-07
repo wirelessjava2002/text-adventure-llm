@@ -5,6 +5,7 @@ import CharacterPortrait from './CharacterPortrait'; // Import the new component
 import calculateLevel from './utils/levelUp'; // Adjust the path as necessary
 
 const Character = ({ characterStats, setCharacterStats }) => {
+    const buildDate = process.env.REACT_APP_BUILD_DATE;
     const [diceRoll, setDiceRoll] = useState(null);
     const [rolling, setRolling] = useState(false);
     const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0); // State for current portrait index
@@ -112,6 +113,7 @@ const Character = ({ characterStats, setCharacterStats }) => {
                         </div>
                     </div>
                 </div>
+                Last built: {buildDate}
             </div>
         </div>
     );

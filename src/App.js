@@ -91,7 +91,7 @@ function App() {
 
     } catch (error) {
         console.error('Error communicating with Gemini:', error);
-        setMessages((prevMessages) => [...prevMessages, { sender: 'GM', text: 'Error: Unable to get a response.' }]);
+        setMessages((prevMessages) => [...prevMessages, { sender: 'GM', text: 'Unable to get a response. server may be initialising. Please refresh, go grab a beer and come back a little later' }]);
     }
 
     setInput('');

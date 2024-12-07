@@ -91,7 +91,7 @@ body {
     text-align: center; /* Centers the text */
     margin-bottom: 20px; /* Adds space below the banner */
     text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.7); /* Adds a shadow around the text */
-    height: 200px; /* Adjust height as needed */
+    height: 240px; /* Adjust height as needed */
 }
 
 .title-banner h1 {
@@ -125,7 +125,7 @@ body {
 }
 
 .user-message {
-    align-self: flex-end; /* Right justify */
+    align-self: flex-start; /* Right justify, flex-end*/
     color: white; /* White text for contrast */
 }
 
@@ -183,6 +183,7 @@ body {
     border: 1px solid #555;
     border-radius: 5px;
     margin-right: 10px;
+    margin-bottom: 20px;
   }
   
   button {
@@ -193,6 +194,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-bottom: 20px;
   }
   
   button:hover {
