@@ -12,6 +12,7 @@ function App() {
   const [rolling, setRolling] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const endOfMessagesRef = useRef(null);
+  const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0);
 
   const { GoogleGenerativeAI } = require("@google/generative-ai");
   const genAI = new GoogleGenerativeAI(process.env.API_KEY);    
@@ -34,6 +35,11 @@ function App() {
     experiencePoints: 0,
     level: 1
   });
+
+  const handlePortraitChange = (newIndex) => {
+    console.log("Portrait changed to index:", newIndex);
+    setCurrentPortraitIndex(newIndex); // Update state in App.js
+  };
 
   useEffect(() => {
     const initializeGame = async () => {
@@ -58,10 +64,9 @@ function App() {
 }, [isInitialized]);
 
 
-
-
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
+    console.log('App.j Current Portrait Index:', currentPortraitIndex);
   }, [messages]);
 
   const handleInputChange = (event) => {
@@ -116,13 +121,28 @@ function App() {
           <h2>Party like it's 1984</h2>
           <p>Welcome brave adventurer, please be patient as this is a <strong>free server</strong>, so may take an age to spin up when idle. Hit refresh, grab an Ale, come back and enjoy!🍺</p>
         </div>
-        <Character characterStats={characterStats} setCharacterStats={setCharacterStats}/>
+        <Character characterStats={characterStats} setCharacterStats={setCharacterStats} currentPortraitIndex={currentPortraitIndex}/>
       </div>
       <div className="right-panel">
         <div className="chat-window">
           {messages.map((msg, index) => (
             <div key={index} className={msg.sender === 'User' ? 'user-message' : msg.sender === 'Dice' ? 'dice-message' : 'gemini-message'}>
+              {msg.sender === 'User' && (
+                <img 
+                  src={`assets/portraits/${(currentPortraitIndex + 1).toString()}.png`}
+                  alt={`User Portrait`}
+                  className="user-portrait"
+                />
+              )}
+              {msg.sender === 'GM' && (
+                <img 
+                  src={`assets/portraits/5.png`}
+                  alt={`GM Portrait ${index + 1}`}
+                  className="gm-portrait"
+                />
+              )}
               <div>
+                
                 <strong>{msg.sender}:</strong> {msg.text}
               </div>
             </div>
