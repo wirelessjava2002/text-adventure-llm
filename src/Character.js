@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Inventory from './Inventory';
-import Dice from './Dice';
 import CharacterPortrait from './CharacterPortrait'; // Import the new component
 import calculateLevel from './utils/levelUp'; // Adjust the path as necessary
+import DiceComponent from './DiceComponent';
 
 const Character = ({ characterStats, setCharacterStats }) => {
     const buildDate = process.env.REACT_APP_BUILD_DATE;
@@ -10,6 +10,7 @@ const Character = ({ characterStats, setCharacterStats }) => {
     const [rolling, setRolling] = useState(false);
     const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0); // State for current portrait index
     const totalPortraits = 14; // Total number of portraits
+
 
     // Function to reroll the ability stats
     const rollStats = () => {
@@ -50,6 +51,13 @@ const Character = ({ characterStats, setCharacterStats }) => {
             }
         });
     };
+
+    const handleDiceRoll = (result) => {
+        // setMessages((prevMessages) => [
+        //   ...prevMessages,
+        //   { sender: 'Dice', text: `You rolled: ${result.total}` }
+        // ]);
+      };
 
     useEffect(() => {
         console.log('Character Stats in Character.js updated:', characterStats);
@@ -102,14 +110,15 @@ const Character = ({ characterStats, setCharacterStats }) => {
                         <Inventory />
                         <div className="roll-dice-container">
                             <h3>Dice</h3>
-                            <button onClick={rollD20} className="roll-dice-button">Roll D20</button>
+                            {/* <button onClick={rollD20} className="roll-dice-button">Roll D20</button>
                             <div className="dice-animation">
                                 {rolling ? (
                                     <p>Rolling...</p>
                                 ) : (
                                     <p>{diceRoll !== null ? `Result: ${diceRoll}` : '🎲'}</p>
                                 )}
-                            </div>
+                            </div> */}
+                         <DiceComponent onDiceRoll={handleDiceRoll} />
                         </div>
                     </div>
                 </div>

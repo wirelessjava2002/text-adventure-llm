@@ -5,6 +5,7 @@ import Character from './Character';
 import parseResponse from './utils/parseResponse';
 
 
+
 function App() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
@@ -41,6 +42,7 @@ function App() {
     setCurrentPortraitIndex(newIndex); // Update state in App.js
   };
 
+
   useEffect(() => {
     const initializeGame = async () => {
         if (!isInitialized) {
@@ -54,6 +56,7 @@ function App() {
                 setMessages((prevMessages) => [...prevMessages, initialSetting]);
                 setIsInitialized(true); // Ensures this runs only once
                 console.log('Request sent to backend engine:');
+                //await diceBox.init()
             } catch (error) {
                 console.error('Error initializing game:', error);
             }
@@ -68,6 +71,13 @@ function App() {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
     console.log('App.j Current Portrait Index:', currentPortraitIndex);
   }, [messages]);
+
+  const handleDiceRoll = (result) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: 'Dice', text: `You rolled: ${result.total}` }
+    ]);
+  };
 
   const handleInputChange = (event) => {
     setInput(event.target.value);
@@ -93,6 +103,8 @@ function App() {
 
         // Call parseResponse with updated state
         parseResponse(response.data.reply, setCharacterStats, characterStats);
+
+       // diceBox.roll('2d20');
 
     } catch (error) {
         console.error('Error communicating with Gemini:', error);
@@ -121,6 +133,7 @@ function App() {
           <h2>Party like it's 1984</h2>
           <p>Welcome brave adventurer, please be patient as this is a <strong>free server</strong>, so may take an age to spin up when idle. Hit refresh, grab an Ale, come back and enjoy!🍺</p>
         </div>
+      {/* <DiceComponent onDiceRoll={handleDiceRoll} /> */}
         <Character characterStats={characterStats} setCharacterStats={setCharacterStats} currentPortraitIndex={currentPortraitIndex}/>
       </div>
       <div className="right-panel">
@@ -163,6 +176,7 @@ function App() {
       </div>
     </div>
   );
+
 }
 
 export default App;

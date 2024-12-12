@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  position: relative;
   height: 100vh; /* Take full viewport height */
 }
 
@@ -10,9 +11,12 @@
 
 .App-body {
     display: flex;
-    flex: 1; /* Allow the body to take remaining height */
-    position: relative; /* To position the input box at the bottom */
-  }
+    flex-direction: column;
+    flex: 1;
+    height: calc(100vh - 50px); /* Adjust height to leave space for the header or footer */
+    overflow: hidden; /* Prevent content from spilling out */
+}
+
 
 html, body {
     height: 100%; /* Ensure full height */
@@ -27,14 +31,8 @@ html, body {
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    flex: 0 0 auto; /* Prevent the header from growing */
+    min-height: 50px; /* Adjust based on your design */
 }
 
 .App-link {
@@ -104,17 +102,17 @@ body {
 }
 
 .chat-window {
-    flex-grow: 1; /* Make the chat window take all available space */
-    flex: 1; /* Allow chat window to take available space */
-    overflow-y: auto; /* Enable scrolling */
-    margin-bottom: 20px; /* Space below chat window */
+    flex: 1; /* Allow chat window to take up available space */
+    overflow-y: auto; /* Enable vertical scrolling */
     background-color: #2a2a2a; /* Slightly lighter grey for chat window */
     border-radius: 5px; /* Rounded corners */
     padding: 10px; /* Padding inside chat window */
     display: flex; /* Use flexbox for layout */
     flex-direction: column; /* Stack messages vertically */
-    max-height: 80vh; /* Limit height so the chat window doesn't grow indefinitely */
-  }
+    height: calc(95vh - 180px); /* Adjust height based on header, footer, or other content */
+    box-sizing: border-box; /* Include padding in height calculation */
+}
+
 
 .user-message, .gemini-message, .dice-message {
     width: 100%; /* Ensure the message container takes full width */
@@ -492,4 +490,25 @@ button:hover {
     border-radius: 50%; /* Make the image round */
     object-fit: cover; /* Ensure the image covers the area without distortion */
     margin-right: 10px; /* Space between the image and the message text */
+}
+
+#dice-box {
+    position: fixed; /* Use fixed positioning to overlay on the viewport */
+    top: 50px;       /* Adjust this value to position it vertically */
+    left: 0;         /* Anchor to the left */
+    width: 100%;     /* Set the width to 100% of the viewport */
+    max-width: 600px; /* Optional: Set a maximum width */
+    height: 600px;   /* Set the height of the box */
+    /* z-index: 1000;   Ensure it is on top of other elements */
+/* Optional: semi-transparent background */
+}
+
+#dice-canvas {
+    position: fixed; /* Use fixed positioning to overlay on the viewport */
+    top: 50px;       /* Adjust this value to position it vertically */
+    left: 33%;         /* Anchor to the left */
+    width: 66%;       /* Make the canvas fill the box */
+    height: 85%;      /* Make the canvas fill the box */
+    display: block;    /* Ensure the canvas is displayed as a block element */
+    /* background-color: rgba(255, 255, 255, 0.8);  */
 }

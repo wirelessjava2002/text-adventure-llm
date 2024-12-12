@@ -5,9 +5,10 @@
  */
 const calculateLevel = (experiencePoints) => {
     // Each level requires 100 experience points
-    const level = Math.floor(experiencePoints / 275);
+    let level = Math.floor(experiencePoints / 275);
     console.log("CalculateLevel experience points:", experiencePoints);
     console.log("CalculateLevel:", level);
+    level = level <= 0 ? 1 : level;
     return level;
 };
 
