@@ -21,8 +21,26 @@ const DiceComponent = () => {
         theme: "default",
         themeColor: "#e68aaa",
         friction: 1.0,
-
       });
+
+      dice.onRollComplete = (rollResult) => {
+        console.log("Roll results:", rollResult);
+      
+        // Ensure rollResult is an array and has at least one item
+        if (Array.isArray(rollResult) && rollResult.length > 0) {
+          const firstRoll = rollResult[0];
+          if (firstRoll.rolls && firstRoll.rolls.length > 0) {
+            const value = firstRoll.rolls[0].value; // Extract the value
+            console.log("Extracted value:", value);
+            setRolledValue(value); // Update the state
+          } else {
+            console.error("No rolls found in the first result.");
+          }
+        } else {
+          console.error("Invalid roll result:", rollResult);
+        }
+      };
+      
 
       return dice.init().then(() => {
         console.log("DiceBox initialized!");
@@ -47,16 +65,19 @@ const DiceComponent = () => {
 
   const rollDice = () => {
     if (diceBoxRef.current) {
+      console.log("Rolling the dice..."); // Debugging statement
       diceBoxRef.current.show();
       diceBoxRef.current.roll("1d20"); // Adjust the roll as needed
+    } else {
+      console.error("DiceBox is not initialized."); // Error handling
     }
   };
 
   return (
     <div>
-      <div id="dice-box" ></div>
-        <button onClick={rollDice}>Roll Dice</button>
-      <p>You rolled: {rolledValue}</p>
+      <div id="dice-box"></div>
+      <button onClick={rollDice}>Roll Dice</button>
+      <p>You rolled: {rolledValue !== null ? rolledValue : 'Roll the dice!'}</p>
     </div>
   );
 };

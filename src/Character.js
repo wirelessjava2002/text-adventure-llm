@@ -53,11 +53,9 @@ const Character = ({ characterStats, setCharacterStats }) => {
     };
 
     const handleDiceRoll = (result) => {
-        // setMessages((prevMessages) => [
-        //   ...prevMessages,
-        //   { sender: 'Dice', text: `You rolled: ${result.total}` }
-        // ]);
-      };
+        // Update the diceRoll state with the result from the DiceComponent
+        setDiceRoll(result.total); // Assuming result.total contains the rolled value
+    };
 
     useEffect(() => {
         console.log('Character Stats in Character.js updated:', characterStats);
@@ -110,15 +108,8 @@ const Character = ({ characterStats, setCharacterStats }) => {
                         <Inventory />
                         <div className="roll-dice-container">
                             <h3>Dice</h3>
-                            {/* <button onClick={rollD20} className="roll-dice-button">Roll D20</button>
-                            <div className="dice-animation">
-                                {rolling ? (
-                                    <p>Rolling...</p>
-                                ) : (
-                                    <p>{diceRoll !== null ? `Result: ${diceRoll}` : '🎲'}</p>
-                                )}
-                            </div> */}
-                         <DiceComponent onDiceRoll={handleDiceRoll} />
+                            <DiceComponent onDiceRoll={handleDiceRoll} />
+                            {diceRoll !== null && <p>Last Roll: {diceRoll}</p>}
                         </div>
                     </div>
                 </div>
