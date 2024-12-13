@@ -67,16 +67,21 @@ function App() {
 }, [isInitialized]);
 
 
+
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
     console.log('App.j Current Portrait Index:', currentPortraitIndex);
   }, [messages]);
 
-  const handleDiceRoll = (result) => {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { sender: 'Dice', text: `You rolled: ${result.total}` }
-    ]);
+  const handleDiceRoll = (rolledValue) => {
+    console.log("Dice rolled in App:", rolledValue);
+    setDiceValue(rolledValue);
+
+    const diceRollMessage = { sender: "User", text: `Rolled a dice and got ${rolledValue}` };
+
+    setMessages((prevMessages) => [...prevMessages, diceRollMessage]);
+
+    handleSubmit({ target: { value: `Dice roll result: ${rolledValue}` } });
   };
 
   const handleInputChange = (event) => {
@@ -114,17 +119,6 @@ function App() {
     setInput('');
 };
 
-
-  const rollDice = () => {
-    setRolling(true);
-    const newValue = Math.floor(Math.random() * 20) + 1;
-    setDiceValue(newValue);
-    setTimeout(() => {
-      setMessages((prevMessages) => [...prevMessages, { sender: 'Dice', text: `You rolled a: ${newValue}` }]);
-      setRolling(false);
-    }, 1000);
-  };
-
   return (
     <div className="App">
       <div className="left-panel">
@@ -134,7 +128,7 @@ function App() {
           <p>Welcome brave adventurer, please be patient as this is a <strong>free server</strong>, so may take an age to spin up when idle. Hit refresh, grab an Ale, come back and enjoy!🍺</p>
         </div>
       {/* <DiceComponent onDiceRoll={handleDiceRoll} /> */}
-        <Character characterStats={characterStats} setCharacterStats={setCharacterStats} currentPortraitIndex={currentPortraitIndex}/>
+        <Character characterStats={characterStats} setCharacterStats={setCharacterStats} currentPortraitIndex={currentPortraitIndex} onDiceRoll={handleDiceRoll}/>
       </div>
       <div className="right-panel">
         <div className="chat-window">

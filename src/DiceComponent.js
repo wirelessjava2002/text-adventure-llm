@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import DiceBox from "@3d-dice/dice-box";
 
-const DiceComponent = () => {
+const DiceComponent = ({ onDiceRoll }) => {
   const diceBoxRef = useRef(null);
   const [rolledValue, setRolledValue] = useState(null);
   const initializedRef = useRef(false);
@@ -33,6 +33,7 @@ const DiceComponent = () => {
             const value = firstRoll.rolls[0].value; // Extract the value
             console.log("Extracted value:", value);
             setRolledValue(value); // Update the state
+            onDiceRoll(value);
           } else {
             console.error("No rolls found in the first result.");
           }

@@ -53,8 +53,9 @@ const Character = ({ characterStats, setCharacterStats }) => {
     };
 
     const handleDiceRoll = (result) => {
+        console.log('Handle Dice Roll in Character.js updated:', result);
         // Update the diceRoll state with the result from the DiceComponent
-        setDiceRoll(result.total); // Assuming result.total contains the rolled value
+        setDiceRoll(result); // Assuming result.total contains the rolled value
     };
 
     useEffect(() => {
@@ -109,7 +110,6 @@ const Character = ({ characterStats, setCharacterStats }) => {
                         <div className="roll-dice-container">
                             <h3>Dice</h3>
                             <DiceComponent onDiceRoll={handleDiceRoll} />
-                            {diceRoll !== null && <p>Last Roll: {diceRoll}</p>}
                         </div>
                     </div>
                 </div>
