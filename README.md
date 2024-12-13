@@ -44,9 +44,10 @@ To get started with the Text Adventure Game, follow these steps:
    Navigate to `http://localhost:3000` to start playing!
 
 6. **On Push Pipeline Deploy**:
-   `https://text-adventure-llm.onrender.com/`
 
-   https://dashboard.render.com/
+   `https://675c9fa70d7e30007a348d54--remarkable-puffpuff-72e975.netlify.app/`
+
+   https://app.netlify.com/teams/wirelessjava2002/
 
 ## 🎮 Usage
 
@@ -70,9 +71,6 @@ graph TD;
     F --> A;
 ```
 
-## 📱 Screenshots
-
-![Game Interface](https://via.placeholder.com/800x400?text=Game+Interface+Screenshot)
 
 ## 🛠️ Technologies Used
 
