@@ -4,10 +4,8 @@ import CharacterPortrait from './CharacterPortrait'; // Import the new component
 import calculateLevel from './utils/levelUp'; // Adjust the path as necessary
 import DiceComponent from './DiceComponent';
 
-const Character = ({ characterStats, setCharacterStats }) => {
+const Character = ({ characterStats, setCharacterStats, onDiceRoll }) => {
     const buildDate = process.env.REACT_APP_BUILD_DATE;
-    const [diceRoll, setDiceRoll] = useState(null);
-    const [rolling, setRolling] = useState(false);
     const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0); // State for current portrait index
     const totalPortraits = 14; // Total number of portraits
 
@@ -30,17 +28,6 @@ const Character = ({ characterStats, setCharacterStats }) => {
         }));
     };
 
-    const rollD20 = () => {
-        setRolling(true);
-        setDiceRoll(null);
-
-        setTimeout(() => {
-            const result = Math.floor(Math.random() * 20) + 1;
-            setDiceRoll(result);
-            setRolling(false);
-        }, 1000);
-    };
-
     // Function to change the portrait
     const changePortrait = (direction) => {
         setCurrentPortraitIndex((prevIndex) => {
@@ -52,10 +39,10 @@ const Character = ({ characterStats, setCharacterStats }) => {
         });
     };
 
-    const handleDiceRoll = (result) => {
+    const notifyDiceRoll = (result) => {
         console.log('Handle Dice Roll in Character.js updated:', result);
         // Update the diceRoll state with the result from the DiceComponent
-        setDiceRoll(result); // Assuming result.total contains the rolled value
+        onDiceRoll(result);
     };
 
     useEffect(() => {
@@ -109,7 +96,7 @@ const Character = ({ characterStats, setCharacterStats }) => {
                         <Inventory />
                         <div className="roll-dice-container">
                             <h3>Dice</h3>
-                            <DiceComponent onDiceRoll={handleDiceRoll} />
+                            <DiceComponent onDiceRoll={notifyDiceRoll} />
                         </div>
                     </div>
                 </div>

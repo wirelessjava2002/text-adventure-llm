@@ -45,6 +45,7 @@ To get started with the Text Adventure Game, follow these steps:
 
 6. **On Push Pipeline Deploy**:
 
+   `https://eldoria.quest/`
    `https://675c9fa70d7e30007a348d54--remarkable-puffpuff-72e975.netlify.app/`
 
    https://app.netlify.com/teams/wirelessjava2002/

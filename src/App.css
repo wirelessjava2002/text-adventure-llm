@@ -107,9 +107,10 @@ body {
     background-color: #2a2a2a; /* Slightly lighter grey for chat window */
     border-radius: 5px; /* Rounded corners */
     padding: 10px; /* Padding inside chat window */
+    padding-bottom: 50px; /* Add extra padding at the bottom */
     display: flex; /* Use flexbox for layout */
     flex-direction: column; /* Stack messages vertically */
-    height: calc(95vh - 180px); /* Adjust height based on header, footer, or other content */
+    height: calc(95vh - 200px); /* Adjust height based on header, footer, or other content */
     box-sizing: border-box; /* Include padding in height calculation */
 }
 
@@ -173,7 +174,7 @@ body {
     border: 1px solid #555;
     border-radius: 5px;
     margin-right: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   
   button {

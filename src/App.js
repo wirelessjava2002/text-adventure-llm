@@ -19,7 +19,7 @@ function App() {
   const genAI = new GoogleGenerativeAI(process.env.API_KEY);    
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const initialContextPrompt = "You are a Dungeon Master in a fantasy game setting using the D20 rules system. Guide the players through their adventure and respond in character with one or 2 scentance responses. You must stay in charactter at all times. Intermittently award player EXP in the format number then the words 'experience points' when they achieve anything in the game, like killing a monster or finding an item";
+  const initialContextPrompt = "You are a Dungeon Master in a fantasy game setting using the D20 rules system. Guide the players through their adventure and respond in character with 2 or 3 scentance responses. You must stay in charactter at all times. Intermittently award player EXP in the format number then the words 'experience points' when they achieve anything in the game, like killing a monster or finding an item. Only accespt a dice roll number if you say roll the dice";
 
   const [characterStats, setCharacterStats] = useState({
     name: "Adventurer",
@@ -73,51 +73,78 @@ function App() {
     console.log('App.j Current Portrait Index:', currentPortraitIndex);
   }, [messages]);
 
-  const handleDiceRoll = (rolledValue) => {
-    console.log("Dice rolled in App:", rolledValue);
-    setDiceValue(rolledValue);
-
-    const diceRollMessage = { sender: "User", text: `Rolled a dice and got ${rolledValue}` };
-
-    setMessages((prevMessages) => [...prevMessages, diceRollMessage]);
-
-    handleSubmit({ target: { value: `Dice roll result: ${rolledValue}` } });
-  };
-
-  const handleInputChange = (event) => {
-    setInput(event.target.value);
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const userMessage = { sender: 'User', text: input };
+  const processMessage = async (messageText) => {
+    const userMessage = { sender: 'User', text: messageText };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     try {
         const contextMessages = messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
-        const fullMessage = `${initialContextPrompt}\n${contextMessages}\nUser: ${input}`;
+        const fullMessage = `${initialContextPrompt}\n${contextMessages}\nUser: ${messageText}`;
 
         const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
-          { message: fullMessage},
+          { message: fullMessage },
           { headers: { 'client-id': 'AppInitialization' } }
         );
 
         const geminiMessage = { sender: 'GM', text: response.data.reply };
         setMessages((prevMessages) => [...prevMessages, geminiMessage]);
 
-        // Call parseResponse with updated state
         parseResponse(response.data.reply, setCharacterStats, characterStats);
-
-       // diceBox.roll('2d20');
-
     } catch (error) {
         console.error('Error communicating with Gemini:', error);
-        setMessages((prevMessages) => [...prevMessages, { sender: 'GM', text: 'Unable to get a response. server may be initialising. Please refresh, go grab a beer and come back a little later' }]);
+        setMessages((prevMessages) => [...prevMessages, { sender: 'GM', text: 'Unable to get a response. Server may be initializing. Please refresh, grab a beer, and come back a little later.' }]);
     }
-
-    setInput('');
 };
+
+const handleDiceRoll = (rolledValue) => {
+  console.log("Dice rolled in App:", rolledValue);
+  setDiceValue(rolledValue);
+
+  // Create the dice roll message
+  const diceRollMessage = `Rolled a dice and got ${rolledValue}`;
+
+  // Update state without including the initial context prompt
+  setMessages((prevMessages) => {
+      // Only add the new dice roll message to state
+      const updatedMessages = [...prevMessages, { sender: 'User', text: diceRollMessage }];
+      
+      // Prepare the context for the LLM by combining the preamble and conversation
+      const contextMessages = updatedMessages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
+      const fullMessage = `${initialContextPrompt}\n${contextMessages}\nUser: ${diceRollMessage}`;
+
+      // Send the constructed message to the LLM
+      sendToLLM(fullMessage);
+
+      return updatedMessages; // Return updated state without preamble
+  });
+};
+
+const sendToLLM = async (fullMessage) => {
+  try {
+      const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
+        { message: fullMessage },
+        { headers: { 'client-id': 'AppInitialization' } }
+      );
+
+      // Update the chat window with the GM's reply
+      const geminiMessage = { sender: 'GM', text: response.data.reply };
+      setMessages((prevMessages) => [...prevMessages, geminiMessage]);
+
+      // Parse the response for game logic
+      parseResponse(response.data.reply, setCharacterStats, characterStats);
+  } catch (error) { }
+};
+
+const handleInputChange = (event) => {
+    setInput(event.target.value);
+};
+
+const handleSubmit = (event) => {
+    event.preventDefault();
+    processMessage(input);
+    setInput(''); // Clear input after submission
+};
+
 
   return (
     <div className="App">
