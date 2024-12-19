@@ -13,14 +13,14 @@ const DiceComponent = ({ onDiceRoll }) => {
         element: "#dice-box",
         id: "dice-canvas",
         assetPath: "/assets/dice-box/",
-        scale: 5,
+        scale: 6,
         startingHeight: 8,
-        throwForce: 6,
-        spinForce: 5,
+        throwForce: 7,
+        spinForce: 8,
         lightIntensity: 1.0,
         theme: "default",
         themeColor: "#e68aaa",
-        friction: 1.0,
+        friction: 2.0,
       });
 
       dice.onRollComplete = (rollResult) => {
