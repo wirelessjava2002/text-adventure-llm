@@ -21,7 +21,7 @@ const Character = ({ characterStats, setCharacterStats, onDiceRoll }) => {
             charisma: Math.floor(Math.random() * 16) + 5,
         };
 
-        // Use setCharacterStats passed from App.js to update the stats
+        // Use setCharacterStats passed from mainApp.js to update the stats
         setCharacterStats((prevStats) => ({
             ...prevStats, // Spread the previous stats
             ...newStats, // Apply the new stats to update only the ability scores

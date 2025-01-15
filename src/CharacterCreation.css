@@ -1,0 +1,37 @@
+.character-creation-container {
+    display: flex; /* Use Flexbox for layout */
+    height: 100vh; /* Full height of the viewport */
+    background-color: black; /* Set the background color to black for the entire container */
+}
+
+.left-section,
+.right-section {
+    flex: 1; /* Take up equal space on the left and right */
+    background-color: #111010; /* Optional: Darker background for side sections */
+}
+
+.middle-section {
+    flex: 0 0 33%; /* Fixed width of 33% for the middle section */
+    padding: 20px; /* Add some padding */
+    background-color: black; /* Set the background color to black for the middle section */
+    color: white; /* Set text color to white for better contrast */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional shadow for better visibility */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+}
+
+.character-portrait {
+    display: flex;
+    flex-direction: column; /* Stack the image and buttons vertically */
+    align-items: center; /* Center the content horizontally */
+    margin: 20px 0; /* Space above and below the portrait section */
+}
+
+.portrait-image {
+    width: 100%; /* Set the image width to 100% of its container */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 10px; /* Space between the image and buttons */
+}
+
