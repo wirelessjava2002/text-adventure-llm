@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Inventory from './Inventory';
-import CharacterPortrait from './CharacterPortrait'; // Import the new component
-import calculateLevel from './utils/levelUp'; // Adjust the path as necessary
+import CharacterPortrait from './CharacterPortrait'; 
 import DiceComponent from './DiceComponent';
 
 const Character = ({ characterStats, setCharacterStats, onDiceRoll }) => {
     const buildDate = process.env.REACT_APP_BUILD_DATE;
-    const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0); // State for current portrait index
-    const totalPortraits = 14; // Total number of portraits
+    const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0);
+    const totalPortraits = 14;
 
 
     // Function to reroll the ability stats
