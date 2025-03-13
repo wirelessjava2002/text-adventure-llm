@@ -30,7 +30,7 @@ const DiceComponent = ({ onDiceRoll }) => {
         if (Array.isArray(rollResult) && rollResult.length > 0) {
           const firstRoll = rollResult[0];
           if (firstRoll.rolls && firstRoll.rolls.length > 0) {
-            const value = firstRoll.rolls[0].value; // Extract the value
+            const value = firstRoll.rolls[0].value; 
             console.log("Extracted value:", value);
             setRolledValue(value); // Update the state
             onDiceRoll(value);
@@ -52,25 +52,25 @@ const DiceComponent = ({ onDiceRoll }) => {
     if (!initializedRef.current) {
       console.log("DiceBox Mounted, in config!");
       initializeDiceBox();
-      initializedRef.current = true; // Set to true after initialization
+      initializedRef.current = true;
     }
 
     // Cleanup when the component unmounts
     return () => {
       if (diceBoxRef.current) {
-        diceBoxRef.current.hide(); // Hide the canvas when the component unmounts
-        diceBoxRef.current = null; // Clean up the reference
+        diceBoxRef.current.hide(); 
+        diceBoxRef.current = null;
       }
     };
   }, []); // Empty dependency array ensures the effect runs only once
 
   const rollDice = () => {
     if (diceBoxRef.current) {
-      console.log("Rolling the dice..."); // Debugging statement
+      console.log("Rolling the dice..."); 
       diceBoxRef.current.show();
-      diceBoxRef.current.roll("1d20"); // Adjust the roll as needed
+      diceBoxRef.current.roll("1d20");
     } else {
-      console.error("DiceBox is not initialized."); // Error handling
+      console.error("DiceBox is not initialized.");
     }
   };
 

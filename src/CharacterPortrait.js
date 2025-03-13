@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './CharacterCreation.css'; // Import the CSS file for styles
+import './CharacterCreation.css'; 
 
 const CharacterPortrait = ({ totalPortraits = 14 }) => {
     const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0); // State for current portrait index

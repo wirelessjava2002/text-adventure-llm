@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CharacterCreation from './CharacterCreation';
-import MainApp from './MainApp'; // Import your renamed MainApp component
+import MainApp from './MainApp';
 
 function App() {
     return (

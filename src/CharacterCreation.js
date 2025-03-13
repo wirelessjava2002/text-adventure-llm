@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { useNavigate } from 'react-router-dom'; 
 import CharacterPortrait from './CharacterPortrait';
-import './CharacterCreation.css'; // Import the CSS file for styles
+import './CharacterCreation.css'; 
 
 const CharacterCreation = () => {
     const navigate = useNavigate(); // Initialize useNavigate
