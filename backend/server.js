@@ -1,47 +1,83 @@
 const express = require('express');
 const cors = require('cors');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
+
+// If using Node < 18, uncomment:
+// const fetch = require('node-fetch');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const genAI = new GoogleGenerativeAI(process.env.API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
+const CF_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 
-const recentRequests = new Map();
+// Choose one Cloudflare model
+const MODEL_NAME = "@cf/llama-3.1-8b-instruct";
+// Alternatives:
+// "@cf/openai/llama-3.2-11b-text"
+// "@cf/qwen/Qwen2-7B-Instruct"
+// "@cf/meta/llama-3.3-70b-instruct"
+
+async function callCloudflareAI(prompt) {
+    const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/${MODEL_NAME}`;
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${CF_API_TOKEN}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            messages: [
+                { role: "user", content: prompt }
+            ]
+        })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(JSON.stringify(result, null, 2));
+    }
+
+    return result.result.response || "(No response)";
+}
 
 app.post('/api/chat', async (req, res) => {
     const timestamp = new Date().toISOString();
     const prompt = req.body.message;
 
-      // Log client's full request details
-    console.log(`[${timestamp}] Client Request Received:`);
-    console.log(`Body:`, req.body); // Logs the request body, whole prompt
+    console.log(`\n[${timestamp}] Prompt:`, prompt);
 
-    // Check if the prompt was recently processed
-    if (recentRequests.has(prompt)) {
-        console.log(`[${timestamp}] Duplicate prompt detected:`, prompt);
-        return res.status(429).json({ reply: 'Duplicate request detected.' });
+    if (!prompt) {
+        return res.status(400).json({ reply: "Empty prompt." });
     }
 
     try {
-        // Add to recent requests with a 10-second TTL
-        recentRequests.set(prompt, true);
-        setTimeout(() => recentRequests.delete(prompt), 10000);
+        const reply = await callCloudflareAI(prompt);
 
-        const result = await model.generateContent([prompt]);
-        console.log(`[${timestamp}] Response generated:`, result.response.text());
-        res.json({ reply: result.response.text() });
+        console.log(`[${timestamp}] Reply:`, reply);
+
+        res.json({
+            reply,
+            modelUsed: MODEL_NAME
+        });
+
     } catch (error) {
         console.error(`[${timestamp}] Error:`, error);
-        res.status(500).json({ reply: 'An error occurred.' });
+        res.status(500).json({
+            reply: "An error occurred.",
+            error: error.message
+        });
     }
 });
 
+const PORT = process.env.PORT || 10000;
+console.log("🔥 Using Cloudflare Account ID:", process.env.CLOUDFLARE_ACCOUNT_ID);
+console.log("🔥 Using Cloudflare API Token:", process.env.CLOUDFLARE_API_TOKEN ? "Loaded" : "NOT LOADED");
 
-const PORT = process.env.PORT || 5000; 
 app.listen(PORT, () => {
-    console.log(`Backend running on http://localhost:${PORT}`);
+    console.log(`\n🚀 Backend running on http://localhost:${PORT}`);
+    console.log(`💡 Using Cloudflare Workers AI model: ${MODEL_NAME}`);
 });

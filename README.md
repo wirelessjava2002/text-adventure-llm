@@ -30,13 +30,14 @@ To get started with the Text Adventure Game, follow these steps:
    ```
 
 3. **Set Up Environment Variables**:
-   Create a `.env` file in the root directory and add your API key:
+   Create a `.env` file in the root directory of the backend and add your API key:
    ```plaintext
    API_KEY=your_google_api_key
    ```
 
-4. **Start the Development Server**:
+4. **Start the Backend Development Server**:
    ```bash
+   cd backend
    npm start
    ```
 
@@ -110,3 +111,9 @@ User: whats brown and sticky
 GM: The specter tilts its skeletal head, a flicker of something akin to amusement in its burning eyes. "I'll give you one guess, mortal."
 User: a stick?
 GM: The specter bursts into a cacophony of rattling laughter, a sound both chilling and strangely mirthful. "Indeed, mortal! You have proven yourself worthy." 200 experience points
+
+## CloudFlare
+https://dash.cloudflare.com/449673cb461c601e0b4ec900e4d0fecc/ai/workers-ai
+add to .env file under backend folder
+CLOUDFLARE_API_TOKEN=your_token_here
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id

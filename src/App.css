@@ -1,515 +1,153 @@
-.App {
-  text-align: center;
-  position: relative;
-  height: 100vh; /* Take full viewport height */
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-.App-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    height: calc(100vh - 50px); /* Adjust height to leave space for the header or footer */
-    overflow: hidden; /* Prevent content from spilling out */
-}
-
-
+/* ===== GLOBAL RESET ===== */
 html, body {
-    height: 100%; /* Ensure full height */
-    overflow: hidden; /* Disable body scroll */
-  }
-  
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: #121212;
 }
 
-.App-header {
-    flex: 0 0 auto; /* Prevent the header from growing */
-    min-height: 50px; /* Adjust based on your design */
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-body {
-    font-family: 'Roboto', sans-serif; /* Use the modern font */
-    background-color: #121212; /* Dark background color */
-    color: #ffffff; /* White text for contrast */
-    margin: 0;
-    padding: 0;
-}
-
+/* ===== ROOT APP LAYOUT ===== */
 .App {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* Prevent whole-page scrolling */
+  box-sizing: border-box;
 }
 
+/* ===== LEFT PANEL ===== */
 .left-panel {
-    flex: 0 0 33%; /* Set left panel to 33% width */
-    margin-right: 20px;
-    background-color: #1e1e1e; /* Dark grey background for the left panel */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Darker shadow for depth */
-    padding: 20px;
+  width: 33%;
+  background: #222;
+  color: white;
+  padding: 20px;
+  overflow-y: auto; /* Scrolls independently if content is long */
+  box-sizing: border-box;
+  border-right: 2px solid #000;
 }
 
+/* ===== RIGHT PANEL ===== */
 .right-panel {
-    flex: 0 0 66%; /* Set right panel to 66% width */
-    background-color: #1e1e1e; /* Dark grey background for the right panel */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Darker shadow for depth */
-    padding: 20px;
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-    position: relative; /* Set position to relative for absolute positioning of input */
+  width: 67%;
+  background: #1a1a1a;
+  color: white;
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* Prevent panel overflow, chat handles its own scroll */
+  box-sizing: border-box;
 }
 
-.title-banner {
-    background-size: cover; /* Ensures the image covers the area */
-    background-position: center; /* Centers the image */
-    border-radius: 8px; /* Optional: adds rounded corners */
-    padding: 20px; /* Adds some spacing inside */
-    text-align: center; /* Centers the text */
-    margin-bottom: 20px; /* Adds space below the banner */
-    text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.7); /* Adds a shadow around the text */
-    height: 240px; /* Adjust height as needed */
-}
-
-.title-banner h1 {
-    font-size: 4rem; /* Makes the h1 text larger */
-    color: white;
-    -webkit-text-stroke: 1px black; /* Adds a black border around the white text */
-    text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.7); /* Keeps the text shadow */
-    margin: 0; /* Remove any default margin */
-}
-
+/* ===== CHAT WINDOW ===== */
 .chat-window {
-    flex: 1; /* Allow chat window to take up available space */
-    overflow-y: auto; /* Enable vertical scrolling */
-    background-color: #2a2a2a; /* Slightly lighter grey for chat window */
-    border-radius: 5px; /* Rounded corners */
-    padding: 10px; /* Padding inside chat window */
-    padding-bottom: 50px; /* Add extra padding at the bottom */
-    display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Stack messages vertically */
-    height: calc(95vh - 200px); /* Adjust height based on header, footer, or other content */
-    box-sizing: border-box; /* Include padding in height calculation */
+  flex: 1;                       /* Takes all available space above input */
+  overflow-y: auto;              /* ONLY this area scrolls */
+  background: #2a2a2a;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
-
-.user-message, .gemini-message, .dice-message {
-    width: 100%; /* Ensure the message container takes full width */
-    margin: 5px 0; /* Space between messages */
-}
-
-.chat-window .gemini-message > div {
-    background-color: #3a3a3a; /* Darker gray for GM messages */
-    color: white; /* White text for contrast */
-    padding: 10px; /* Padding inside messages */
-    border-radius: 5px; /* Rounded corners */
-    width: 100%; /* Full width */
-    box-sizing: border-box; /* Include padding in width calculation */
-    text-align: left; /* Left justify text for GM */
-    font-size: larger;
-}
-
-.chat-window .user-message > div {
-    background-color: #2e2e2e; /* Dark gray for user messages */
-    color: white; /* White text for contrast */
-    padding: 10px; /* Padding inside messages */
-    border-radius: 5px; /* Rounded corners */
-    width: 100%; /* Full width */
-    box-sizing: border-box; /* Include padding in width calculation */
-    text-align: left; /* Right justify text for User */
-    font-size: larger;
-}
-
+/* ===== MESSAGE BUBBLES ===== */
+.user-message,
+.gm-message,
 .dice-message {
-    align-self: flex-start; /* Left justify */
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
 }
 
-.dice-message > div {
-    background-color: #5a5a5a; /* Darker gray for dice messages */
-    padding: 10px; /* Padding inside messages */
-    border-radius: 5px; /* Rounded corners */
-    width: 100%; /* Full width */
-    box-sizing: border-box; /* Include padding in width calculation */
+/* USER bubbles */
+.user-message {
+  background: #3a3a3a;
+  color: white;
 }
 
+/* GM bubbles */
+.gm-message {
+  background: #333;
+  color: white;
+}
+
+/* Dice bubbles */
+.dice-message {
+  background: #555;
+  color: white;
+}
+
+/* ===== PORTRAITS (Round 60px) ===== */
+.user-portrait,
+.gm-portrait {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; /* ROUND portraits */
+  object-fit: cover;
+  flex-shrink: 0;     /* Prevent layout jump */
+  display: block;
+}
+
+/* ===== INPUT FORM (stays at bottom) ===== */
 .input-form {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: absolute; /* Position at the bottom */
-    bottom: 20px; /* Adjust the distance from the bottom */
-    left: 20px;
-    right: 20px;
-    background-color: #1e1e1e; /* Same as panel background to blend */
-    padding: 10px;
-    border-radius: 5px;
-    z-index: 10; /* Ensure it stays on top of other elements */
-  }
-  
-  .input-box {
-    flex: 1; /* Allow input box to take available width */
-    padding: 10px;
-    border: 1px solid #555;
-    border-radius: 5px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-  }
-  
-  button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin-bottom: 20px;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-
-.rolling-dice {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100px; /* Adjust height as needed */
-    margin: 20px 0; /* Add some margin for spacing */
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0; /* Prevent resizing */
 }
 
-.dice {
-    margin-top: 30px; /* Add some space above the dice */
-}
-
-.roll-button {
-    padding: 20px 40px; /* Increase padding for a larger button */
-    font-size: 28px; /* Increase font size for better visibility */
-    background-color: #8B4513; /* Brown background */
-    color: white; /* White text color */
-    border: none; /* Remove border */
-    border-radius: 8px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-    width: 200px; /* Set a fixed width for the button */
-    height: 80px; /* Set a fixed height for the button */
-}
-
-.roll-button:hover {
-    background-color: #6B2A14; /* Darker brown on hover */
-}
-
-.character {
-    background-color: #0c0c0c; /* Dark background */
-    display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Stack items vertically */
-    height: 100%; /* Allow the character box to take full height */
-    border: 2px solid #8b4513; /* Brown border for the outline */
-    border-radius: 10px; /* Rounded corners */
-    padding: 20px; /* Padding inside the box */
-    background-color: rgba(0, 0, 0, 0.9); /* Light background for better visibility */
-    margin: 20px; /* Space around the box */
-}
-
-.character h2 {
-    background-color: #0c0c0c; /* Dark background */
-    margin: 0; /* Remove default margin */
-    font-size: 1.5em; /* Increase font size */
-}
-
-.character ul {
-    list-style-type: none; /* Remove bullet points */
-    padding: 0; /* Remove padding */
-}
-
-.roll-stats-button {
-    padding: 10px 20px; /* Padding for the button */
-    font-size: 16px; /* Font size */
-    background-color: #8B4513; /* Brown background */
-    color: white; /* White text */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    margin-top: 10px; /* Space above the button */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-}
-
-.roll-stats-button:hover {
-    background-color: #6B2A14; /* Darker brown on hover */
-}
-
-.inventory {
-    background-color: rgba(255, 255, 255, 0.9); /* Light background */
-    padding: 10px;
-    border: 1px solid #8b4513; /* Brown border */
-    border-radius: 5px; /* Rounded corners */
-    margin-top: 20px; /* Space above the inventory */
-    flex: 1; /* Allow the inventory to take up available space */
-    display: flex; /* Use flexbox for the inventory */
-    flex-direction: column; /* Stack items vertically */
-    justify-content: flex-start; /* Align items to the top */
-    overflow: auto; /* Allow scrolling if content exceeds height */
-    min-height: 200px; /* Set a minimum height for the inventory box */
-}
-
-.inventory h3 {
-    margin: 0; /* Remove default margin */
-    font-size: 1.5em; /* Increase font size */
-}
-
-.inventory ul {
-    flex-grow: 1; /* Allow the list to grow and take available space */
-    overflow-y: auto; /* Allow scrolling if content exceeds height */
-}
-
-.add-item-button {
-    margin-top: 10px; /* Space above the button */
-    padding: 5px 10px; /* Padding for the button */
-    font-size: 14px; /* Font size */
-    background-color: #8B4513; /* Brown background */
-    color: white; /* White text */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-}
-
-.add-item-button:hover {
-    background-color: #6B2A14; /* Darker brown on hover */
-}
-
-.character-attributes,
-.ability-scores,
-.combat-stats {
-    background-color: #2a2a2a; /* Dark grey background for the boxes */
-    border-radius: 8px; /* Rounded corners */
-    padding: 15px; /* Padding inside the box */
-    margin-bottom: 20px; /* Space below the box */
-    color: #ffffff; /* White text for contrast */
-}
-
-.character-attributes h3,
-.ability-scores h3,
-.combat-stats h3 {
-    margin: 0; /* Remove default margin */
-    font-size: 1.5em; /* Increase font size */
-}
-
-.character-attributes p,
-.ability-scores ul li,
-.combat-stats ul li {
-    text-align: left; /* Ensure all text is left-justified */
-}
-
-.roll-dice-container {
-    margin-top: 20px; /* Space above the roll dice container */
-    padding: 10px; /* Padding inside the container */
-    border: 1px solid #8b4513; /* Brown border */
-    border-radius: 5px; /* Rounded corners */
-    background-color: rgba(255, 255, 255, 0.9); /* Light background */
-    display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Stack items vertically */
-    align-items: center; /* Center items horizontally */
-}
-
-.roll-dice-button {
-    margin-bottom: 10px; /* Space below the button */
-    padding: 5px 10px; /* Padding for the button */
-    font-size: 14px; /* Font size */
-    background-color: #8B4513; /* Brown background */
-    color: white; /* White text */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-}
-
-.roll-dice-button:hover {
-    background-color: #6B2A14; /* Darker brown on hover */
-}
-
-.dice-animation {
-    font-size: 24px; /* Size for the animated dice */
-    /* Add any additional styles for the animated dice here */
-}
-
-.user-message, .gemini-message, .dice-message {
-    font-size: 20px; /* Set font size for chat messages to 20px */
-    line-height: 1.5; /* Improve line height for readability */
-}
-
-.adventurer-box, .attribute-box {
-    background-color: #000000; /* Dark grey background for boxes */
-    border-radius: 8px; /* Rounded corners */
-    padding: 15px; /* Padding inside the box */
-    margin-bottom: 20px; /* Space below the box */
-    color: #ffffff; /* White text for contrast */
-}
-
-.right-column {
-    flex: 0 0 66%; /* Set right panel to 66% width */
-    background-color: #1e1e1e; /* Dark grey background for the right panel */
-    border-radius: 8px; /* Rounded corners */
-    padding: 20px; /* Padding inside the right column */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow for depth */
-}
-
-.roll-dice-container {
-    background-color: #2a2a2a; /* Dark grey background for the dice container */
-    border-radius: 8px; /* Rounded corners */
-    padding: 15px; /* Padding inside the box */
-    margin-top: 20px; /* Space above the box */
-    color: #ffffff; /* White text for contrast */
-}
-
-.character-container {
-    background-color: #2a2a2a; /* Dark grey background for the dice container */
-    display: flex; /* Use Flexbox for layout */
-    justify-content: space-between; /* Space between columns */
-    padding: 20px; /* Add padding to the container */
-}
-
-.left-column,
-.right-column {
-    flex: 1; /* Set both columns to take equal space */
-    margin-right: 10px; /* Space between columns */
-}
-
-.right-column {
-    margin-right: 0; /* Remove margin on the right column */
-    background-color: #1e1e1e; /* Dark grey background for the right panel */
-    border-radius: 8px; /* Rounded corners */
-    padding: 20px; /* Padding inside the right column */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow for depth */
-    overflow: hidden; /* Prevent overflow */
-}
-
-.roll-dice-container {
-    background-color: #2a2a2a; /* Dark grey background for the dice container */
-    border-radius: 8px; /* Rounded corners */
-    padding: 15px; /* Padding inside the box */
-    margin-top: 20px; /* Space above the box */
-    color: #ffffff; /* White text for contrast */
-}
-
-/* Ensure Inventory also has proper styling */
-.inventory {
-    background-color: #2a2a2a; /* Dark grey background for Inventory */
-    border-radius: 8px; /* Rounded corners */
-    padding: 15px; /* Padding inside the Inventory box */
-    margin-bottom: 20px; /* Space below the Inventory box */
-    color: #ffffff; /* White text for contrast */
-}
-
-.adventurer-panel {
-    background-color: #000000; /* Darker grey for the Adventurer panel */
-    border-radius: 8px; /* Rounded corners */
-    padding: 20px; /* Padding inside the panel */
-    color: #ffffff; /* White text for contrast */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow for depth */
-}
-
-.character-portrait {
-    display: flex;
-    flex-direction: column; /* Stack the image and buttons vertically */
-    align-items: center; /* Center the content horizontally */
-    margin: 20px 0; /* Space above and below the portrait section */
-}
-
-.portrait-image {
-    width: 100%; /* Set the image width to 100% of its container */
-    height: auto; /* Maintain aspect ratio */
-    max-width: 200px; /* Optional: Set a max width to prevent it from being too large */
-    margin-bottom: 10px; /* Space between the image and buttons */
-}
-
-.portrait-navigation {
-    display: flex; /* Use flexbox for button layout */
-    justify-content: space-between; /* Space buttons evenly */
-    width: 100%; /* Full width for the button container */
+.input-box {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #222;
+  color: white;
 }
 
 button {
-    padding: 10px 15px;
-    background-color: #8B4513; /* Brown color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  padding: 10px 14px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 button:hover {
-    background-color: #6B2A14; /* Darker brown on hover */
+  background: #0056b3;
 }
 
-.user-message {
-    display: flex; /* Use flexbox to align the image and text */
-    align-items: center; /* Center the items vertically */
-    margin: 10px 0; /* Space between messages */
-}
-
-.user-portrait {
-    width: 60px; /* Set a fixed width for the portrait */
-    height: 60px; /* Set a fixed height to maintain aspect ratio */
-    border-radius: 50%; /* Make the image round */
-    object-fit: cover; /* Ensure the image covers the area without distortion */
-    margin-right: 10px; /* Space between the image and the message text */
-}
-
-.gemini-message {
-    display: flex; /* Use flexbox to align the image and text */
-    align-items: center; /* Center the items vertically */
-    margin: 10px 0; /* Space between messages */
-}
-
-.gm-portrait {
-    width: 60px; /* Set a fixed width for the GM portrait */
-    height: 60px; /* Set a fixed height to maintain aspect ratio */
-    border-radius: 50%; /* Make the image round */
-    object-fit: cover; /* Ensure the image covers the area without distortion */
-    margin-right: 10px; /* Space between the image and the message text */
-}
+/* ==== FORCE 3D DICE TO BE A TRUE OVERLAY === */
 
 #dice-box {
-    position: fixed; /* Use fixed positioning to overlay on the viewport */
-    top: 50px;       /* Adjust this value to position it vertically */
-    left: 0;         /* Anchor to the left */
-    width: 100%;     /* Set the width to 100% of the viewport */
-    max-width: 600px; /* Optional: Set a maximum width */
-    height: 600px;   /* Set the height of the box */
-    /* z-index: 1000;   Ensure it is on top of other elements */
-/* Optional: semi-transparent background */
+  position: fixed !important;
+  inset: 0 !important;        /* top:0 left:0 right:0 bottom:0 */
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none !important;
+  z-index: 9999 !important;
+  background: transparent !important;
+  overflow: hidden !important;
 }
 
+/* DiceBox injects a canvas with its own ID */
 #dice-canvas {
-    position: fixed; /* Use fixed positioning to overlay on the viewport */
-    top: 50px;       /* Adjust this value to position it vertically */
-    left: 33%;         /* Anchor to the left */
-    width: 66%;       /* Make the canvas fill the box */
-    height: 85%;      /* Make the canvas fill the box */
-    display: block;    /* Ensure the canvas is displayed as a block element */
-    /* background-color: rgba(255, 255, 255, 0.8);  */
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  pointer-events: none !important;
 }
+
+

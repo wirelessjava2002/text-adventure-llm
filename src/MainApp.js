@@ -160,7 +160,14 @@ const handleSubmit = (event) => {
             <div className="right-panel">
                 <div className="chat-window">
                     {messages.map((msg, index) => (
-                        <div key={index} className={msg.sender === 'User' ? 'user-message' : msg.sender === 'Dice' ? 'dice-message' : 'gemini-message'}>
+                        <div
+                            key={index}
+                            className={
+                                msg.sender === 'User' ? "user-message"
+                                : msg.sender === 'Dice' ? "dice-message"
+                                : "gm-message"
+                            }
+                        >
                             {msg.sender === 'User' && (
                                 <img 
                                     src={`assets/portraits/${(currentPortraitIndex + 1).toString()}.png`}
