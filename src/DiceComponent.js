@@ -5,6 +5,7 @@ const DiceComponent = ({ onDiceRoll }) => {
   const diceBoxRef = useRef(null);
   const [rolledValue, setRolledValue] = useState(null);
   const initializedRef = useRef(false);
+  const lastRollRef = useRef({ value: null, ts: 0 });
 
   useEffect(() => {
     // Initialize DiceBox only once when the component mounts
@@ -23,24 +24,34 @@ const DiceComponent = ({ onDiceRoll }) => {
         friction: 2.0,
       });
 
-      dice.onRollComplete = (rollResult) => {
-        console.log("Roll results:", rollResult);
-      
-        // Ensure rollResult is an array and has at least one item
-        if (Array.isArray(rollResult) && rollResult.length > 0) {
-          const firstRoll = rollResult[0];
-          if (firstRoll.rolls && firstRoll.rolls.length > 0) {
-            const value = firstRoll.rolls[0].value; 
-            console.log("Extracted value:", value);
-            setRolledValue(value); // Update the state
-            onDiceRoll(value);
-          } else {
-            console.error("No rolls found in the first result.");
-          }
-        } else {
-          console.error("Invalid roll result:", rollResult);
-        }
-      };
+    dice.onRollComplete = (rollResult) => {
+      // Extract_numeric_value (your existing logic)
+      const firstRoll = rollResult?.[0];
+      const newValue = firstRoll?.rolls?.[0]?.value;
+
+      if (newValue == null) return;
+
+      const now = Date.now();
+
+      // ---- DEDUPE LOGIC ----
+      const last = lastRollRef.current;
+      const isDuplicateValue = last.value === newValue;
+      const isTooSoon = now - last.ts < 300;   // 300ms dedupe window
+
+      if (isDuplicateValue && isTooSoon) {
+        console.log("IGNORED DUPLICATE DICE EVENT:", newValue);
+        return; // 💥 Prevent double-processing
+      }
+
+      // Store this event
+      lastRollRef.current = { value: newValue, ts: now };
+
+      // ---- Process legitimate roll ----
+      console.log("ACCEPTED DICE EVENT:", newValue);
+
+      setRolledValue(newValue);
+      onDiceRoll(newValue);
+    };
       
 
       return dice.init().then(() => {

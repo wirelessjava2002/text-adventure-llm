@@ -17,12 +17,10 @@ function MainApp() {
     const [rolling, setRolling] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
     const endOfMessagesRef = useRef(null);
+    const initLock = useRef(false);
+
 
     const [currentPortraitIndexState, setCurrentPortraitIndex] = useState(currentPortraitIndex || 0);
-
-    const { GoogleGenerativeAI } = require("@google/generative-ai");
-    const genAI = new GoogleGenerativeAI(process.env.API_KEY);    
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const initialContextPrompt = "You are a Dungeon Master in a fantasy game setting using the D20 rules system. Guide the players through their adventure and respond in character with 2 or 3 sentence responses. You must stay in character at all times. Intermittently award player EXP in the format number then the words 'experience points' when they achieve anything in the game, like killing a monster or finding an item. Only accept a dice roll number if you say roll the dice";
 
@@ -48,27 +46,28 @@ function MainApp() {
   };
 
     useEffect(() => {
-        const initializeGame = async () => {
-            if (!isInitialized) {
-                try {
-                    const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
-                        { message: `${initialContextPrompt} At the start, describe the setting for the adventure in great detail.`},
-                        { headers: { 'client-id': 'AppInitialization' } }
-                    );
+    if (initLock.current) return;  // <-- prevents StrictMode double-run
+    initLock.current = true;
 
-                    const initialSetting = { sender: 'GM', text: response.data.reply };
-                    setMessages((prevMessages) => [...prevMessages, initialSetting]);
-                    setIsInitialized(true); // Ensures this runs only once
-                    console.log('Request sent to backend engine:');
-                    //await diceBox.init()
-                } catch (error) {
-                    console.error('Error initializing game:', error);
-                }
-            }
-        };
+    const initializeGame = async () => {
+        try {
+        const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
+            { message: `${initialContextPrompt} At the start, describe the setting for the adventure in great detail.` },
+            { headers: { 'client-id': 'AppInitialization' } }
+        );
 
-        initializeGame();
-    }, [isInitialized]);
+        const initialSetting = { sender: 'GM', text: response.data.reply };
+        setMessages(prev => [...prev, initialSetting]);
+        setIsInitialized(true);
+
+        } catch (error) {
+        console.error('Error initializing game:', error);
+        }
+    };
+
+    initializeGame();
+    }, []);
+
 
     useEffect(() => {
         endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -88,38 +87,37 @@ function MainApp() {
                 { headers: { 'client-id': 'AppInitialization' } }
             );
 
-            const geminiMessage = { sender: 'GM', text: response.data.reply };
-            setMessages((prevMessages) => [...prevMessages, geminiMessage]);
+            const llmMessage = { sender: 'GM', text: response.data.reply };
+            setMessages((prevMessages) => [...prevMessages, llmMessage]);
 
             parseResponse(response.data.reply, setCharacterStats, characterStatsState);
         } catch (error) {
-            console.error('Error communicating with Gemini:', error);
+            console.error('Error communicating with backend LLM:', error);
             setMessages((prevMessages) => [...prevMessages, { sender: 'GM', text: 'Unable to get a response. Server may be initializing. Please refresh, grab a beer, and come back a little later.' }]);
         }
     };
 
-    const handleDiceRoll = (rolledValue) => {
-        console.log("Dice rolled in App:", rolledValue);
-        setDiceValue(rolledValue);
+const handleDiceRoll = (rolledValue) => {
+  console.log("HANDLE DICE ROLL FIRED");
+  console.log("Dice rolled in App:", rolledValue);
 
-        // Create the dice roll message
-        const diceRollMessage = `Rolled a dice and got ${rolledValue}`;
+  const diceRollMessage = `Rolled a dice and got ${rolledValue}`;
 
-        // Update state without including the initial context prompt
-        setMessages((prevMessages) => {
-            // Only add the new dice roll message to state
-            const updatedMessages = [...prevMessages, { sender: 'User', text: diceRollMessage }];
-            
-            // Prepare the context for the LLM by combining the preamble and conversation
-            const contextMessages = updatedMessages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
-            const fullMessage = `${initialContextPrompt}\n${contextMessages}\nUser: ${diceRollMessage}`;
+  // 1️⃣ Add the user message once
+  setMessages(prev => {
+    return [...prev, { sender: 'User', text: diceRollMessage }];
+  });
 
-            // Send the constructed message to the LLM
-            sendToLLM(fullMessage);
+  // 2️⃣ Build context separately
+  const contextMessages = [...messages, { sender: 'User', text: diceRollMessage }]
+    .map(msg => `${msg.sender}: ${msg.text}`)
+    .join('\n');
 
-            return updatedMessages; // Return updated state without preamble
-        });
-    };
+  const fullMessage = `${initialContextPrompt}\n${contextMessages}`;
+
+  // 3️⃣ Call LLM OUTSIDE of setMessages updater
+  sendToLLM(fullMessage);
+};
 
 const sendToLLM = async (fullMessage) => {
   try {
@@ -129,8 +127,8 @@ const sendToLLM = async (fullMessage) => {
       );
 
       // Update the chat window with the GM's reply
-      const geminiMessage = { sender: 'GM', text: response.data.reply };
-      setMessages((prevMessages) => [...prevMessages, geminiMessage]);
+      const llmMessage = { sender: 'GM', text: response.data.reply };
+      setMessages((prevMessages) => [...prevMessages, llmMessage]);
 
             // Parse the response for game logic
             parseResponse(response.data.reply, setCharacterStats, characterStatsState);

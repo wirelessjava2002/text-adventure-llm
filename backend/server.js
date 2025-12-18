@@ -13,7 +13,7 @@ const CF_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
 const CF_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 
 // Choose one Cloudflare model
-const MODEL_NAME = "@cf/llama-3.1-8b-instruct";
+const MODEL_NAME = "@cf/meta/llama-3.1-8b-instruct";
 // Alternatives:
 // "@cf/openai/llama-3.2-11b-text"
 // "@cf/qwen/Qwen2-7B-Instruct"
