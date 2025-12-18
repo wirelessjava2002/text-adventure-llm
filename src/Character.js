@@ -1,108 +1,128 @@
-import React, { useEffect, useState } from 'react';
-import Inventory from './Inventory';
-import CharacterPortrait from './CharacterPortrait'; 
-import DiceComponent from './DiceComponent';
+import React, { useEffect, useState } from "react";
+import Inventory from "./Inventory";
+import CharacterPortrait from "./CharacterPortrait";
+import DiceComponent from "./DiceComponent";
 
 const Character = ({ characterStats, setCharacterStats, onDiceRoll }) => {
-    const buildDate = process.env.REACT_APP_BUILD_DATE;
-    const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0);
-    const totalPortraits = 14;
+  const buildDate = process.env.REACT_APP_BUILD_DATE;
+  const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0);
+  const totalPortraits = 14;
 
-
-    // Function to reroll the ability stats
-    const rollStats = () => {
-        const newStats = {
-            strength: Math.floor(Math.random() * 16) + 5,
-            dexterity: Math.floor(Math.random() * 16) + 5,
-            constitution: Math.floor(Math.random() * 16) + 5,
-            intelligence: Math.floor(Math.random() * 16) + 5,
-            wisdom: Math.floor(Math.random() * 16) + 5,
-            charisma: Math.floor(Math.random() * 16) + 5,
-        };
-
-        // Use setCharacterStats passed from mainApp.js to update the stats
-        setCharacterStats((prevStats) => ({
-            ...prevStats, // Spread the previous stats
-            ...newStats, // Apply the new stats to update only the ability scores
-        }));
+  /* ---------------------
+     Ability Score Reroll
+     --------------------- */
+  const rollStats = () => {
+    const newStats = {
+      strength: Math.floor(Math.random() * 16) + 5,
+      dexterity: Math.floor(Math.random() * 16) + 5,
+      constitution: Math.floor(Math.random() * 16) + 5,
+      intelligence: Math.floor(Math.random() * 16) + 5,
+      wisdom: Math.floor(Math.random() * 16) + 5,
+      charisma: Math.floor(Math.random() * 16) + 5,
     };
 
-    // Function to change the portrait
-    const changePortrait = (direction) => {
-        setCurrentPortraitIndex((prevIndex) => {
-            if (direction === 'left') {
-                return (prevIndex - 1 + totalPortraits) % totalPortraits; // Wrap around to the last portrait
-            } else {
-                return (prevIndex + 1) % totalPortraits; // Wrap around to the first portrait
-            }
-        });
-    };
+    setCharacterStats((prev) => ({
+      ...prev,
+      ...newStats,
+    }));
+  };
 
-    const notifyDiceRoll = (result) => {
-        console.log('Handle Dice Roll in Character.js updated:', result);
-        // Update the diceRoll state with the result from the DiceComponent
-        onDiceRoll(result);
-    };
+  /* -------------------------
+     Portrait Navigation
+     ------------------------- */
+  const changePortrait = (direction) => {
+    setCurrentPortraitIndex((prevIndex) => {
+      if (direction === "left") {
+        return (prevIndex - 1 + totalPortraits) % totalPortraits;
+      } else {
+        return (prevIndex + 1) % totalPortraits;
+      }
+    });
+  };
 
-    useEffect(() => {
-        console.log('Character Stats in Character.js updated:', characterStats);
-        console.log('Current Portrait Index:', currentPortraitIndex);
-    }, [characterStats, setCharacterStats]);  // This will trigger when characterStats changes
+  const notifyDiceRoll = (result) => {
+    console.log("Handle Dice Roll in Character.js updated:", result);
+    onDiceRoll(result);
+  };
 
-    return (
-        <div className="adventurer-panel">
-            <div className="character">
-                <h2>{characterStats.name}</h2>
-                <div className="character-container">
-                    <div className="left-column">
-                    <CharacterPortrait 
-                            currentPortraitIndex={currentPortraitIndex} 
-                            changePortrait={changePortrait} 
-                        />
-                        <div className="character-attributes">
-                            <h3>Character Attributes</h3>
-                            <p><strong>Name:</strong> {characterStats.name}</p>
-                            <p><strong>Class:</strong> Warrior</p>
-                            <p><strong>Level:</strong> {characterStats.level}</p>
-                            <p><strong>Race:</strong> Human</p>
-                            <p><strong>Alignment:</strong> Neutral Good</p>
-                        </div>
-                        <div className="combat-stats">
-                            <h3>Combat Stats</h3>
-                            <ul>
-                                <li><strong>Armor Class (AC):</strong> {characterStats.armorClass}</li>
-                                <li><strong>Initiative:</strong> {characterStats.initiative}</li>
-                                <li><strong>Hit Points (HP):</strong> {characterStats.hitPoints}</li>
-                                <li><strong>Hit Die (HD):</strong> {characterStats.hitDie}</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="right-column">
-                    <div className="ability-scores">
-                            <h3>Ability Scores</h3>
-                            <ul>
-                                <li><strong>Strength:</strong> {characterStats.strength}</li>
-                                <li><strong>Dexterity:</strong> {characterStats.dexterity}</li>
-                                <li><strong>Constitution:</strong> {characterStats.constitution}</li>
-                                <li><strong>Intelligence:</strong> {characterStats.intelligence}</li>
-                                <li><strong>Wisdom:</strong> {characterStats.wisdom}</li>
-                                <li><strong>Charisma:</strong> {characterStats.charisma}</li>
-                                <p><strong>Experience:</strong> {characterStats.experiencePoints}</p>
-                            </ul>
-                            {/* ReRoll Button */}
-                            <button onClick={rollStats} className="roll-stats-button small-button">ReRoll</button>
-                        </div>
-                        <Inventory />
-                        <div className="roll-dice-container">
-                            <h3>Dice</h3>
-                            <DiceComponent onDiceRoll={notifyDiceRoll} />
-                        </div>
-                    </div>
-                </div>
-                Last built: {buildDate}
-            </div>
+  useEffect(() => {
+    console.log("Character Stats in Character.js updated:", characterStats);
+  }, [characterStats]);
+
+  /* --------------------------------------------------------
+     D&D STYLE CHARACTER PANEL (Two Columns, No Scrolling)
+     -------------------------------------------------------- */
+  return (
+    <div className="character-panel">
+
+      {/* ======== PORTRAIT SECTION ======== */}
+      <div className="portrait-section">
+        <CharacterPortrait
+          currentPortraitIndex={currentPortraitIndex}
+          changePortrait={changePortrait}
+        />
+
+        <h2 className="character-name">{characterStats.name}</h2>
+        <p className="build-date">Build: {buildDate}</p>
+      </div>
+
+      {/* ======== MAIN GRID ======== */}
+      <div className="character-grid">
+
+        {/* COLUMN 1: Attributes */}
+        <div className="stat-box">
+          <h3>Character Attributes</h3>
+          <ul>
+            <li><strong>Class:</strong> Warrior</li>
+            <li><strong>Level:</strong> {characterStats.level}</li>
+            <li><strong>Race:</strong> Human</li>
+            <li><strong>Alignment:</strong> Neutral Good</li>
+            <li><strong>XP:</strong> {characterStats.experiencePoints}</li>
+          </ul>
         </div>
-    );
+
+        {/* COLUMN 2: Combat */}
+        <div className="stat-box">
+          <h3>Combat Stats</h3>
+          <ul>
+            <li><strong>Armor Class:</strong> {characterStats.armorClass}</li>
+            <li><strong>Initiative:</strong> {characterStats.initiative}</li>
+            <li><strong>Hit Points:</strong> {characterStats.hitPoints}</li>
+            <li><strong>Hit Die:</strong> {characterStats.hitDie}</li>
+          </ul>
+        </div>
+
+        {/* COLUMN 1: Ability Scores */}
+        <div className="stat-box">
+          <h3>Ability Scores</h3>
+          <ul>
+            <li><strong>STR:</strong> {characterStats.strength}</li>
+            <li><strong>DEX:</strong> {characterStats.dexterity}</li>
+            <li><strong>CON:</strong> {characterStats.constitution}</li>
+            <li><strong>INT:</strong> {characterStats.intelligence}</li>
+            <li><strong>WIS:</strong> {characterStats.wisdom}</li>
+            <li><strong>CHA:</strong> {characterStats.charisma}</li>
+          </ul>
+          <button onClick={rollStats} className="reroll-button">
+            Re-roll Stats
+          </button>
+        </div>
+
+        {/* COLUMN 2: Dice Roller */}
+        <div className="stat-box">
+          <h3>Dice Roller</h3>
+          <DiceComponent onDiceRoll={notifyDiceRoll} />
+        </div>
+
+        {/* Full-width Inventory */}
+        <div className="stat-box full-width">
+          <h3>Inventory</h3>
+          <Inventory />
+        </div>
+
+      </div>
+    </div>
+  );
 };
 
 export default Character;

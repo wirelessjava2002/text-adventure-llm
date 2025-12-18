@@ -148,11 +148,6 @@ const handleSubmit = (event) => {
     return (
         <div className="App">
             <div className="left-panel">
-                <div className="title-banner" style={{ backgroundImage: `url('/assets/fantasy-banner.png')` }}>
-                    <h1>Lands of Eldoria</h1>
-                    <h2>Party like it's 1984</h2>
-                    <p>Welcome brave adventurer, You have found an undocumented development server. I am a solo developer learning such things as ReactJS and LLM's. With a fist full of dice, and a little AI, we can make this thing truly beautiful. Grab an Ale, come back and enjoy!🍺</p>
-                </div>
                 <Character characterStats={characterStatsState} setCharacterStats={setCharacterStats} currentPortraitIndex={currentPortraitIndexState} onDiceRoll={handleDiceRoll}/>
             </div>
             <div className="right-panel">
