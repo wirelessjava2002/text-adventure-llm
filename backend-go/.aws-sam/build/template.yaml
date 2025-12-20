@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Dungeon Master Go Backend
-
 Globals:
   Function:
     Timeout: 20
@@ -9,22 +8,20 @@ Globals:
     Runtime: go1.x
     Handler: bootstrap
     Architectures:
-      - x86_64
-
+    - x86_64
 Resources:
   DungeonMasterApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       CorsConfiguration:
         AllowOrigins:
-          - "*"
+        - '*'
         AllowHeaders:
-          - Content-Type
-          - client-id
+        - Content-Type
+        - client-id
         AllowMethods:
-          - POST
-          - OPTIONS
-
+        - POST
+        - OPTIONS
 DungeonMasterFunction:
   Type: AWS::Serverless::Function
   Properties:
@@ -38,10 +35,11 @@ DungeonMasterFunction:
       Chat:
         Type: HttpApi
         Properties:
-          ApiId: !Ref DungeonMasterApi
+          ApiId:
+            Ref: DungeonMasterApi
           Path: /api/chat
           Method: POST
     Environment:
       Variables:
-        CLOUDFLARE_ACCOUNT_ID: "{{resolve:ssm:/dm/cloudflare/account_id}}"
-        CLOUDFLARE_API_TOKEN: "{{resolve:ssm:/dm/cloudflare/api_token}}"
+        CLOUDFLARE_ACCOUNT_ID: '{{resolve:ssm:/dm/cloudflare/account_id}}'
+        CLOUDFLARE_API_TOKEN: '{{resolve:ssm:/dm/cloudflare/api_token}}'
