@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Dungeon Master Go Backend
+
+Resources:
+  DMApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowHeaders:
+          - Content-Type
+          - client-id
+        AllowMethods:
+          - POST
+          - OPTIONS
+
+  DMFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: dungeon-master-go
+      Runtime: go1.x
+      Handler: bootstrap
+      CodeUri: .
+      MemorySize: 256
+      Timeout: 15
+      Events:
+        Chat:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref DMApi
+            Path: /api/chat
+            Method: POST
+      Environment:
+        Variables:
+          CLOUDFLARE_ACCOUNT_ID: "{{resolve:ssm:/dm/cloudflare/account_id}}"
+          CLOUDFLARE_API_TOKEN: "{{resolve:ssm:/dm/cloudflare/api_token}}"
