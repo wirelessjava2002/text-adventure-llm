@@ -3,8 +3,10 @@ package adapters
 import (
 	"context"
 	"encoding/json"
-	
+	"log"
+
 	"text-adventure-llm/app"
+
 	"github.com/aws/aws-lambda-go/events"
 )
 
@@ -12,6 +14,10 @@ func ChatLambdaHandler(
 	ctx context.Context,
 	req events.APIGatewayProxyRequest,
 ) (events.APIGatewayProxyResponse, error) {
+
+	log.Println("Lambda handler invoked")
+	log.Printf("Raw event body: %q\n", req.Body)
+	log.Printf("Headers: %+v\n", req.Headers)
 
 	var chatReq app.ChatRequest
 	json.Unmarshal([]byte(req.Body), &chatReq)

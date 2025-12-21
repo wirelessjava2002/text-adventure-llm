@@ -5,12 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
 )
 
 func CallCloudflare(prompt string) (string, error) {
+	log.Println("Calling Cloudflare Workers AI")
+
 	cfAccountID := os.Getenv("CLOUDFLARE_ACCOUNT_ID")
 	cfAPIToken := os.Getenv("CLOUDFLARE_API_TOKEN")
 
@@ -59,6 +62,8 @@ func CallCloudflare(prompt string) (string, error) {
 	defer resp.Body.Close()
 
 	respBody, _ := io.ReadAll(resp.Body)
+
+	log.Printf("Cloudflare HTTP status: %d\n", resp.StatusCode)
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return "", fmt.Errorf(
