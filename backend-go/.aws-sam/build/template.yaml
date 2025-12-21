@@ -1,45 +1,54 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Dungeon Master Go Backend
+Description: Dungeon Master Go Backend (Serverless)
 Globals:
   Function:
-    Timeout: 20
-    MemorySize: 256
     Runtime: go1.x
-    Handler: bootstrap
     Architectures:
     - x86_64
-Resources:
-  DungeonMasterApi:
-    Type: AWS::Serverless::HttpApi
-    Properties:
-      CorsConfiguration:
-        AllowOrigins:
-        - '*'
-        AllowHeaders:
-        - Content-Type
-        - client-id
-        AllowMethods:
-        - POST
-        - OPTIONS
-DungeonMasterFunction:
-  Type: AWS::Serverless::Function
-  Properties:
-    FunctionName: dungeon-master-go
-    Runtime: go1.x
-    Handler: main
-    CodeUri: cmd/lambda
     MemorySize: 256
     Timeout: 20
-    Events:
-      Chat:
-        Type: HttpApi
-        Properties:
-          ApiId:
-            Ref: DungeonMasterApi
-          Path: /api/chat
-          Method: POST
-    Environment:
-      Variables:
-        CLOUDFLARE_ACCOUNT_ID: '{{resolve:ssm:/dm/cloudflare/account_id}}'
-        CLOUDFLARE_API_TOKEN: '{{resolve:ssm:/dm/cloudflare/api_token}}'
+Resources:
+  DungeonMasterApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: DungeonMasterApi
+      StageName: Prod
+      Cors:
+        AllowOrigin: '''*'''
+        AllowHeaders: '''Content-Type,client-id'''
+        AllowMethods: '''POST,OPTIONS'''
+  DungeonMasterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: dungeon-master-go
+      CodeUri: DungeonMasterFunction
+      Handler: main
+      Events:
+        Chat:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: DungeonMasterApi
+            Path: /api/chat
+            Method: POST
+      Environment:
+        Variables:
+          CLOUDFLARE_ACCOUNT_ID: '{{resolve:ssm:/dm/cloudflare/account_id}}'
+          CLOUDFLARE_API_TOKEN: '{{resolve:ssm:/dm/cloudflare/api_token}}'
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Statement:
+        - Effect: Allow
+          Action:
+          - ssm:GetParameter
+          - ssm:GetParameters
+          Resource:
+          - Fn::Sub: arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/dm/cloudflare/*
+    Metadata:
+      SamResourceId: DungeonMasterFunction
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value:
+      Fn::Sub: https://${DungeonMasterApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/api/chat
