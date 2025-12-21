@@ -1,119 +1,150 @@
-# 🏰 Text Adventure Game with Gemini 1.5 Flash
+# 🧙‍♂️ Dungeon Master — Serverless AI RPG (Go + AWS)
 
-Welcome to the **Text Adventure Game**! This project is a fun and interactive text-based adventure game that utilizes the **Gemini 1.5 Flash** model as the game master. Players can type commands and interact with the game world, while Gemini generates responses to guide the adventure.
+A cloud-native, serverless **AI Dungeon Master** that delivers a Dungeons & Dragons–style role-playing experience through a modern web UI.  
+This project is both a **learning platform for AWS serverless architecture** and a **fully functional game engine** driven by large language models.
 
-## 📜 Project Description
-
-This project aims to recreate the nostalgic experience of classic text adventure games, where players navigate through a fantasy world using text commands. The game leverages the power of the Gemini AI to provide dynamic storytelling and responses, making each playthrough unique.
-
-## ✨ Features
-
-- **Interactive Gameplay**: Players can type commands to interact with the game world.
-- **Dynamic Responses**: The Gemini AI generates responses based on player input, creating a rich narrative experience.
-- **Dungeons & Dragons Theme**: The interface is designed to evoke the feel of classic D&D adventures, complete with a parchment-like background and retro fonts.
-- **User-Friendly Interface**: A clean and intuitive layout that allows players to focus on the adventure.
-
-## 📦 Installation
-
-To get started with the Text Adventure Game, follow these steps:
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/text-adventure-game.git
-   cd text-adventure-game
-   ```
-
-2. **Install Dependencies**:
-   Make sure you have Node.js installed, then run:
-   ```bash
-   npm install
-   ```
-
-3. **Set Up Environment Variables**:
-   Create a `.env` file in the root directory of the backend and add your API key:
-   ```plaintext
-   API_KEY=your_google_api_key
-   ```
-
-4. **Start the Backend Development Server**:
-   ```bash
-   cd backend
-   npm start
-   ```
-
-5. **Open Your Browser**:
-   Navigate to `http://localhost:3000` to start playing!
-
-6. **On Push Pipeline Deploy**:
-
-   `https://eldoria.quest/`
-   `https://675c9fa70d7e30007a348d54--remarkable-puffpuff-72e975.netlify.app/`
-
-   https://app.netlify.com/teams/wirelessjava2002/
-
-## 🎮 Usage
-
-Once the application is running, you can start your adventure by typing commands into the input box at the bottom of the screen. The game will respond with text-based narratives and options based on your input.
-
-### Example Commands:
-- `look around`
-- `go north`
-- `take sword`
-- `talk to the wizard`
-
-## 📊 Application Flow
-
-```mermaid
-graph TD;
-    A[User Input] --> B{Process Input};
-    B -->|Valid Command| C[Send to Gemini AI];
-    B -->|Invalid Command| D[Display Error Message];
-    C --> E[Receive Response];
-    E --> F[Update Chat Window];
-    F --> A;
-```
-
-
-## 🛠️ Technologies Used
-
-- **React**: For building the user interface.
-- **Axios**: For making HTTP requests to the backend.
-- **Gemini 1.5 Flash**: The AI model used for generating game responses.
-- **CSS**: For styling the application with a D&D theme.
-
-## 🤝 Contributing
-
-Contributions are welcome! If you have suggestions for improvements or new features, please open an issue or submit a pull request.
-
-## 📄 License
-
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## 📫 Contact
-
-For any inquiries, please reach out.
 ---
 
-Happy adventuring! May your quests be filled with excitement and discovery! 🧙‍♂️✨
+## ✨ Project Goals
+
+- Build a **fully serverless backend** using AWS
+- Learn and apply **AWS Lambda, API Gateway, DynamoDB, SAM, CloudWatch**
+- Implement a **clean Go backend** that runs both locally and in Lambda
+- Integrate a **low-cost LLM provider (Cloudflare Workers AI)** via REST
+- Create a **React-based frontend** hosted on S3
+- Maintain a professional, production-style architecture
+- Keep everything **re-deployable via Infrastructure as Code** (monthly account resets)
+
+---
+
+## 🏗️ High-Level Architecture
+
+React Frontend (S3)
+|
+v
+API Gateway (REST API)
+|
+v
+AWS Lambda (Go)
+|
+v
+Cloudflare Workers AI (LLM)
 
 
-Example Dialogue:
+> No EC2.  
+> No VPC.  
+> No Bedrock dependency.  
+> Minimal cost, maximum learning.
 
-GM: The moan intensifies, a chilling wail that seems to emanate from the very stones themselves. A shadowy figure begins to take shape within the mist.
-User: talk to figure
-GM: The figure materializes fully, revealing a gaunt specter with eyes burning like embers. It speaks in a voice like rustling bones, "You have trespassed upon sacred ground."
-User: im sorry
-GM: The specter's gaze chills you to the bone, but its wrath seems to lessen slightly. Perhaps there is a way to appease this ancient guardian.
-User: i can tell a joke, the specter may like it
-GM: The specter lets out a rattling chuckle, a sound like stones grinding together. Perhaps humor can bridge even the gap between the living and the spectral realm.
-User: whats brown and sticky
-GM: The specter tilts its skeletal head, a flicker of something akin to amusement in its burning eyes. "I'll give you one guess, mortal."
-User: a stick?
-GM: The specter bursts into a cacophony of rattling laughter, a sound both chilling and strangely mirthful. "Indeed, mortal! You have proven yourself worthy." 200 experience points
+---
 
-## CloudFlare
-https://dash.cloudflare.com/449673cb461c601e0b4ec900e4d0fecc/ai/workers-ai
-add to .env file under backend folder
-CLOUDFLARE_API_TOKEN=your_token_here
-CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+## 🖥️ Frontend
+
+- **React** (Create React App)
+- Hosted on **Amazon S3** (static website hosting)
+- Local dev via `npm start`
+- Production build via `npm run build`
+- Communicates with backend via REST (`/api/chat`)
+
+### Key UI Features
+- Chat-based Dungeon Master interface
+- Dice rolling with **3D animated dice**
+- D&D 5e-style character panel
+- Inventory and stat tracking
+- Clean two-panel layout (no scrolling issues)
+
+---
+
+## ⚙️ Backend (Go)
+
+The backend is written entirely in **Go**, designed with **clean separation of concerns**:
+
+
+### Key Backend Features
+- Runs **locally** (`go run ./cmd/local`)
+- Runs in **AWS Lambda** (same code)
+- Cloudflare Workers AI integration via REST
+- Explicit CORS handling for browser clients
+- Structured logging (CloudWatch-ready)
+- Secrets stored in **AWS SSM Parameter Store**
+
+---
+
+## ☁️ AWS Services Used
+
+| Service | Purpose |
+|------|--------|
+| S3 | Host React frontend |
+| API Gateway (REST) | Public HTTP API |
+| Lambda (Go) | Serverless backend |
+| CloudWatch Logs | Observability & debugging |
+| SSM Parameter Store | Secure secrets |
+| SAM | Infrastructure as Code |
+
+> DynamoDB, Cognito, EventBridge are planned next.
+
+---
+
+## 🤖 LLM Integration
+
+- **Provider:** Cloudflare Workers AI  
+- **Model:** `@cf/meta/llama-3.1-8b-instruct`  
+- **Access:** REST API (no Bedrock dependency)
+- **Reason:** Low cost, reliable, cloud-agnostic
+
+The backend calls Cloudflare directly from Lambda using standard HTTPS — no VPC or NAT required.
+
+---
+
+## 🚀 Running Locally
+
+### Backend (Go)
+```bash
+cd backend-go
+go run ./cmd/local
+
+
+``bash
+http://localhost:10000/api/chat
+npm start
+```
+
+Local Lambda
+```bash
+sam build
+sam local start-api
+```
+
+Deploying to AWS
+
+One time
+```bash
+aws ssm put-parameter --name /dm/cloudflare/account_id --type String --value "<ACCOUNT_ID>"
+aws ssm put-parameter --name /dm/cloudflare/api_token --type SecureString --value "<API_TOKEN>"
+```
+Deploy
+```bash
+sam deploy --guided
+```
+SAM will output an API Gateway URL such as:
+```bash
+https://xxxx.execute-api.eu-west-2.amazonaws.com/Prod/api/chat
+```
+
+🔮 Planned Enhancements
+
+DynamoDB session persistence
+
+Multi-agent NPC personas
+
+Dice modifiers & combat resolution
+
+Cognito authentication
+
+Rate limiting / usage caps
+
+EventBridge for async tasks
+
+CloudFront for frontend CDN
+
+Step Functions for complex orchestration
