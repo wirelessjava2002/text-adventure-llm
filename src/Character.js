@@ -63,7 +63,6 @@ const Character = ({ characterStats, setCharacterStats, onDiceRoll }) => {
         />
 
         <h2 className="character-name">{characterStats.name}</h2>
-        <p className="build-date">Build: {buildDate}</p>
       </div>
 
       {/* ======== MAIN GRID ======== */}

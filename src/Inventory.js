@@ -27,7 +27,7 @@ const Inventory = () => {
                     </li>
                 ))}
             </ul>
-            <button onClick={() => addItem("Potion")} className="add-item-button">Add Potion</button>
+            {/* <button onClick={() => addItem("Potion")} className="add-item-button">Add Potion</button> */}
         </div>
     );
 };

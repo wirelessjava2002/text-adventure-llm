@@ -7,7 +7,7 @@ import parseResponse from './utils/parseResponse';
 
 
 
-function MainApp() {
+function MainApp({ authToken }) {
     const location = useLocation();
     const { characterStats, currentPortraitIndex } = location.state || {};
 
@@ -74,28 +74,52 @@ function MainApp() {
         console.log('App.j Current Portrait Index:', currentPortraitIndex);
     }, [messages]);
 
-  const processMessage = async (messageText) => {
-    const userMessage = { sender: 'User', text: messageText };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+const processMessage = async (messageText) => {
+  const userMessage = { sender: 'User', text: messageText };
+  setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-        try {
-            const contextMessages = messages.map(msg => `${msg.sender}: ${msg.text}`).join('\n');
-            const fullMessage = `${initialContextPrompt}\n${contextMessages}\nUser: ${messageText}`;
+  try {
+    const contextMessages = messages
+      .map(msg => `${msg.sender}: ${msg.text}`)
+      .join('\n');
 
-            const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
-                { message: fullMessage },
-                { headers: { 'client-id': 'AppInitialization' } }
-            );
+    const fullMessage =
+      `${initialContextPrompt}\n${contextMessages}\nUser: ${messageText}`;
 
-            const llmMessage = { sender: 'GM', text: response.data.reply };
-            setMessages((prevMessages) => [...prevMessages, llmMessage]);
-
-            parseResponse(response.data.reply, setCharacterStats, characterStatsState);
-        } catch (error) {
-            console.error('Error communicating with backend LLM:', error);
-            setMessages((prevMessages) => [...prevMessages, { sender: 'GM', text: 'Unable to get a response. Server may be initializing. Please refresh, grab a beer, and come back a little later.' }]);
-        }
+    // Build headers once
+    const headers = {
+      "Content-Type": "application/json",
+      "client-id": "AppInitialization",
     };
+
+    // Add Cognito token ONLY if logged in
+    if (authToken) {
+      headers["Authorization"] = `Bearer ${authToken}`;
+    }
+
+    const response = await axios.post(
+      process.env.REACT_APP_BACKEND_API_URL,
+      { message: fullMessage },
+      { headers }
+    );
+
+    const llmMessage = { sender: 'GM', text: response.data.reply };
+    setMessages((prevMessages) => [...prevMessages, llmMessage]);
+
+    parseResponse(response.data.reply, setCharacterStats, characterStatsState);
+
+  } catch (error) {
+    console.error('Error communicating with backend LLM:', error);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        sender: 'GM',
+        text: 'Unable to get a response. Server may be initializing. Please refresh, grab a beer, and come back a little later.'
+      }
+    ]);
+  }
+};
+
 
 const handleDiceRoll = (rolledValue) => {
   console.log("HANDLE DICE ROLL FIRED");

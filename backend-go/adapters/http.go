@@ -6,6 +6,7 @@ import (
 
 	"text-adventure-llm/app"
 
+	"github.com/aws/aws-lambda-go/events"
 )
 
 func ChatHTTPHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,3 +44,35 @@ func enableCORS(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, client-id")
 }
+
+
+func successResponse(body interface{}) events.APIGatewayProxyResponse {
+	data, _ := json.Marshal(body)
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: 200,
+		Headers: map[string]string{
+			"Content-Type":                 "application/json",
+			"Access-Control-Allow-Origin":  "*",
+			"Access-Control-Allow-Headers": "Content-Type,Authorization",
+		},
+		Body: string(data),
+	}
+}
+
+func errorResponse(status int, message string) events.APIGatewayProxyResponse {
+	data, _ := json.Marshal(map[string]string{
+		"error": message,
+	})
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: status,
+		Headers: map[string]string{
+			"Content-Type":                 "application/json",
+			"Access-Control-Allow-Origin":  "*",
+			"Access-Control-Allow-Headers": "Content-Type,Authorization",
+		},
+		Body: string(data),
+	}
+}
+
