@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"text-adventure-llm/app"
@@ -9,7 +10,13 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+func init() {
+	log.Println("🚨 adapters/http.go COMPILED 🚨")
+}
+
 func ChatHTTPHandler(w http.ResponseWriter, r *http.Request) {
+	
+	log.Println("🔥 ChatHTTPHandler invoked")
 	enableCORS(w)
 
 	if r.Method == http.MethodOptions {
@@ -39,11 +46,16 @@ func ChatHTTPHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
+
 func enableCORS(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, client-id")
+	w.Header().Set(
+		"Access-Control-Allow-Headers",
+		"Content-Type, client-id, Authorization",
+	)
 }
+
 
 
 func successResponse(body interface{}) events.APIGatewayProxyResponse {

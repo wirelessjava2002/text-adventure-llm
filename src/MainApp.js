@@ -5,221 +5,248 @@ import './App.css';
 import Character from './Character';
 import parseResponse from './utils/parseResponse';
 
-
-
 function MainApp({ authToken }) {
-    const location = useLocation();
-    const { characterStats, currentPortraitIndex } = location.state || {};
+  const location = useLocation();
+  const { characterStats, currentPortraitIndex } = location.state || {};
 
-    const [input, setInput] = useState('');
-    const [messages, setMessages] = useState([]);
-    const [diceValue, setDiceValue] = useState(null);
-    const [rolling, setRolling] = useState(false);
-    const [isInitialized, setIsInitialized] = useState(false);
-    const endOfMessagesRef = useRef(null);
-    const initLock = useRef(false);
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState([]);
+  const endOfMessagesRef = useRef(null);
+  const initLock = useRef(false);
+  const [pendingDice, setPendingDice] = useState(null);
 
 
-    const [currentPortraitIndexState, setCurrentPortraitIndex] = useState(currentPortraitIndex || 0);
+  const [currentPortraitIndexState, setCurrentPortraitIndex] = useState(
+    currentPortraitIndex || 0
+  );
 
-    const initialContextPrompt = "You are a Dungeon Master in a fantasy game setting using the D20 rules system. Guide the players through their adventure and respond in character with 2 or 3 sentence responses. You must stay in character at all times. Intermittently award player EXP in the format number then the words 'experience points' when they achieve anything in the game, like killing a monster or finding an item. Only accept a dice roll number if you say roll the dice";
+  const [characterStatsState, setCharacterStats] = useState(
+    characterStats || {
+      name: 'Adventurer',
+      strength: 15,
+      dexterity: 12,
+      constitution: 14,
+      intelligence: 15,
+      wisdom: 13,
+      charisma: 10,
+      armorClass: 16,
+      initiative: 2,
+      hitPoints: 20,
+      hitDie: '1d8',
+      experiencePoints: 0,
+      level: 1,
+    }
+  );
 
-    const [characterStatsState, setCharacterStats] = useState(characterStats || {
-        name: "Adventurer",
-        strength: 15,
-        dexterity: 12,
-        constitution: 14,
-        intelligence: 15,
-        wisdom: 13,
-        charisma: 10,
-        armorClass: 16,
-        initiative: 2,
-        hitPoints: 20,
-        hitDie: "1d8",
-        experiencePoints: 0,
-        level: 1
-    });
+  /* ---------- Initial game start ---------- */
 
-  const handlePortraitChange = (newIndex) => {
-    console.log("Portrait changed to index:", newIndex);
-    setCurrentPortraitIndex(newIndex); // Update state in MainApp.js
-  };
-
-    useEffect(() => {
-    if (initLock.current) return;  // <-- prevents StrictMode double-run
+  useEffect(() => {
+    if (initLock.current) return;
     initLock.current = true;
 
     const initializeGame = async () => {
-        try {
-        const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
-            { message: `${initialContextPrompt} At the start, describe the setting for the adventure in great detail.` },
-            { headers: { 'client-id': 'AppInitialization' } }
+      try {
+        const headers = {
+          'Content-Type': 'application/json',
+          'client-id': 'AppInitialization',
+        };
+
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
+
+        const response = await axios.post(
+          process.env.REACT_APP_BACKEND_API_URL,
+          { input: 'Start the adventure. Describe the setting in detail.' },
+          { headers }
         );
 
-        const initialSetting = { sender: 'GM', text: response.data.reply };
-        setMessages(prev => [...prev, initialSetting]);
-        setIsInitialized(true);
-
-        } catch (error) {
+        setMessages([
+          { sender: 'GM', text: response.data.narrative },
+        ]);
+      } catch (error) {
         console.error('Error initializing game:', error);
-        }
+      }
     };
 
     initializeGame();
-    }, []);
+  }, [authToken]);
+
+  /* ---------- Auto-scroll ---------- */
+
+  useEffect(() => {
+    endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
 
-    useEffect(() => {
-        endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
-        console.log('App.j Current Portrait Index:', currentPortraitIndex);
-    }, [messages]);
+  /* ---------- Send player input ---------- */
 
 const processMessage = async (messageText) => {
-  const userMessage = { sender: 'User', text: messageText };
-  setMessages((prevMessages) => [...prevMessages, userMessage]);
+  setMessages(prev => [...prev, { sender: 'User', text: messageText }]);
 
   try {
-    const contextMessages = messages
-      .map(msg => `${msg.sender}: ${msg.text}`)
-      .join('\n');
-
-    const fullMessage =
-      `${initialContextPrompt}\n${contextMessages}\nUser: ${messageText}`;
-
-    // Build headers once
     const headers = {
-      "Content-Type": "application/json",
-      "client-id": "AppInitialization",
+      'Content-Type': 'application/json',
+      'client-id': 'AppInitialization',
     };
 
-    // Add Cognito token ONLY if logged in
     if (authToken) {
-      headers["Authorization"] = `Bearer ${authToken}`;
+      headers['Authorization'] = `Bearer ${authToken}`;
     }
 
     const response = await axios.post(
       process.env.REACT_APP_BACKEND_API_URL,
-      { message: fullMessage },
+      { input: messageText },
       { headers }
     );
 
-    const llmMessage = { sender: 'GM', text: response.data.reply };
-    setMessages((prevMessages) => [...prevMessages, llmMessage]);
+    // 🎲 Dice GAP: backend is pausing for a roll
+    if (response.data.actions?.[0]?.type === 'REQUEST_DICE_ROLL') {
+      setPendingDice(response.data.actions[0].payload);
 
-    parseResponse(response.data.reply, setCharacterStats, characterStatsState);
+      // Show the narrative that led to the roll
+      setMessages(prev => [
+        ...prev,
+        { sender: 'GM', text: response.data.narrative },
+      ]);
+
+      return; // ⛔ stop here, wait for dice
+    }
+
+    // ✅ Normal flow (no dice requested)
+    setMessages(prev => [
+      ...prev,
+      { sender: 'GM', text: response.data.narrative },
+    ]);
+
+    parseResponse(
+      response.data.narrative,
+      setCharacterStats,
+      characterStatsState
+    );
 
   } catch (error) {
-    console.error('Error communicating with backend LLM:', error);
-    setMessages((prevMessages) => [
-      ...prevMessages,
+    console.error('Error communicating with backend:', error);
+    setMessages(prev => [
+      ...prev,
       {
         sender: 'GM',
-        text: 'Unable to get a response. Server may be initializing. Please refresh, grab a beer, and come back a little later.'
-      }
+        text: '⚠️ LLM JSON parse failed. Check logs.',
+      },
     ]);
   }
 };
 
 
-const handleDiceRoll = (rolledValue) => {
-  console.log("HANDLE DICE ROLL FIRED");
-  console.log("Dice rolled in App:", rolledValue);
+  /* ---------- 🎲 Dice handling  ---------- */
 
-  const diceRollMessage = `Rolled a dice and got ${rolledValue}`;
+  const handleDiceRoll = async (rolledValue) => {
+    if (!pendingDice) return;
 
-  // 1️⃣ Add the user message once
-  setMessages(prev => {
-    return [...prev, { sender: 'User', text: diceRollMessage }];
-  });
+    setMessages(prev => [
+      ...prev,
+      { sender: 'Dice', text: `Rolled ${pendingDice.dice}: ${rolledValue}` }
+    ]);
 
-  // 2️⃣ Build context separately
-  const contextMessages = [...messages, { sender: 'User', text: diceRollMessage }]
-    .map(msg => `${msg.sender}: ${msg.text}`)
-    .join('\n');
-
-  const fullMessage = `${initialContextPrompt}\n${contextMessages}`;
-
-  // 3️⃣ Call LLM OUTSIDE of setMessages updater
-  sendToLLM(fullMessage);
-};
-
-const sendToLLM = async (fullMessage) => {
-  try {
-      const response = await axios.post(process.env.REACT_APP_BACKEND_API_URL, 
-        { message: fullMessage },
-        { headers: { 'client-id': 'AppInitialization' } }
-      );
-
-      // Update the chat window with the GM's reply
-      const llmMessage = { sender: 'GM', text: response.data.reply };
-      setMessages((prevMessages) => [...prevMessages, llmMessage]);
-
-            // Parse the response for game logic
-            parseResponse(response.data.reply, setCharacterStats, characterStatsState);
-        } catch (error) { }
+    const headers = {
+      'Content-Type': 'application/json',
+      'client-id': 'AppInitialization',
     };
 
-const handleInputChange = (event) => {
-    setInput(event.target.value);
-};
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
 
-const handleSubmit = (event) => {
-    event.preventDefault();
-    processMessage(input);
-    setInput(''); // Clear input after submission
-};
+    setPendingDice(null); // clear UI state
 
-    return (
-        <div className="App">
-            <div className="left-panel">
-                <Character characterStats={characterStatsState} setCharacterStats={setCharacterStats} currentPortraitIndex={currentPortraitIndexState} onDiceRoll={handleDiceRoll}/>
-            </div>
-            <div className="right-panel">
-                <div className="chat-window">
-                    {messages.map((msg, index) => (
-                        <div
-                            key={index}
-                            className={
-                                msg.sender === 'User' ? "user-message"
-                                : msg.sender === 'Dice' ? "dice-message"
-                                : "gm-message"
-                            }
-                        >
-                            {msg.sender === 'User' && (
-                                <img 
-                                    src={`assets/portraits/${(currentPortraitIndex + 1).toString()}.png`}
-                                    alt={`User Portrait`}
-                                    className="user-portrait"
-                                />
-                            )}
-                            {msg.sender === 'GM' && (
-                                <img 
-                                    src={`assets/portraits/5.png`}
-                                    alt={`GM Portrait ${index + 1}`}
-                                    className="gm-portrait"
-                                />
-                            )}
-                            <div>
-                                <strong>{msg.sender}:</strong> {msg.text}
-                            </div>
-                        </div>
-                    ))}
-                    <div ref={endOfMessagesRef}></div>
-                </div>
-                <form onSubmit={handleSubmit} className="input-form">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={handleInputChange}
-                        placeholder="Type your command..."
-                        required
-                        className="input-box"
-                    />
-                    <button type="submit">Send</button>
-                </form>
-            </div>
-        </div>
+    await axios.post(
+      process.env.REACT_APP_BACKEND_API_URL,
+      {
+        event: 'DICE_RESULT',
+        dice: pendingDice.dice,
+        result: rolledValue,
+        reason: pendingDice.reason
+      },
+      { headers }
     );
+  };
+
+
+  /* ---------- Input handlers ---------- */
+
+  const handleInputChange = (event) => {
+    setInput(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (!input.trim()) return;
+    processMessage(input);
+    setInput('');
+  };
+
+  /* ---------- Render ---------- */
+
+  return (
+    <div className="App">
+      <div className="left-panel">
+        <Character
+          characterStats={characterStatsState}
+          setCharacterStats={setCharacterStats}
+          currentPortraitIndex={currentPortraitIndexState}
+          onDiceRoll={handleDiceRoll}
+        />
+      </div>
+
+      <div className="right-panel">
+        <div className="chat-window">
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={
+                msg.sender === 'User'
+                  ? 'user-message'
+                  : 'gm-message'
+              }
+            >
+              {msg.sender === 'User' && (
+                <img
+                  src={`assets/portraits/${currentPortraitIndexState + 1}.png`}
+                  alt="User"
+                  className="user-portrait"
+                />
+              )}
+
+              {msg.sender === 'GM' && (
+                <img
+                  src="assets/portraits/5.png"
+                  alt="GM"
+                  className="gm-portrait"
+                />
+              )}
+
+              <div>
+                <strong>{msg.sender}:</strong> {msg.text}
+              </div>
+            </div>
+          ))}
+          <div ref={endOfMessagesRef} />
+        </div>
+
+        <form onSubmit={handleSubmit} className="input-form">
+          <input
+            type="text"
+            value={input}
+            onChange={handleInputChange}
+            placeholder="What do you do?"
+            required
+            className="input-box"
+          />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
 export default MainApp;

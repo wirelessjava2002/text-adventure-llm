@@ -9,6 +9,8 @@ import (
 )
 
 func main() {
+	log.Println("🚨 LOCAL MAIN FILE EXECUTED 🚨")
+
 	_ = godotenv.Load()
 
 	http.HandleFunc("/api/chat", adapters.ChatHTTPHandler)
