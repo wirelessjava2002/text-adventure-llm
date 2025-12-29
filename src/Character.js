@@ -3,8 +3,7 @@ import Inventory from "./Inventory";
 import CharacterPortrait from "./CharacterPortrait";
 import DiceComponent from "./DiceComponent";
 
-const Character = ({ characterStats, setCharacterStats, onDiceRoll }) => {
-  const buildDate = process.env.REACT_APP_BUILD_DATE;
+const Character = ({ characterStats, setCharacterStats, onDiceRoll, pendingDice }) => {
   const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0);
   const totalPortraits = 14;
 
@@ -110,8 +109,26 @@ const Character = ({ characterStats, setCharacterStats, onDiceRoll }) => {
         {/* COLUMN 2: Dice Roller */}
         <div className="stat-box">
           <h3>Dice Roller</h3>
-          <DiceComponent onDiceRoll={notifyDiceRoll} />
+
+          {!pendingDice && (
+            <p className="dice-disabled">
+              🎲 Dice will appear when a roll is required.
+            </p>
+          )}
+
+          {pendingDice && (
+            <>
+              <p className="dice-prompt">
+                Roll <strong>{pendingDice.dice}</strong>
+                <br />
+                <em>{pendingDice.reason}</em>
+              </p>
+
+              <DiceComponent onDiceRoll={notifyDiceRoll} />
+            </>
+          )}
         </div>
+
 
         {/* Full-width Inventory */}
         <div className="stat-box full-width">

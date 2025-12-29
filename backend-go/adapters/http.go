@@ -16,7 +16,7 @@ func init() {
 
 func ChatHTTPHandler(w http.ResponseWriter, r *http.Request) {
 	
-	log.Println("🔥 ChatHTTPHandler invoked")
+
 	enableCORS(w)
 
 	if r.Method == http.MethodOptions {

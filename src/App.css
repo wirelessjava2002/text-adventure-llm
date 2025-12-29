@@ -244,3 +244,25 @@ button:hover {
   background: #a72828;
 }
 
+
+.xp-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #2b2b2b;
+  color: gold;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  box-shadow: 0 0 12px rgba(255,215,0,0.5);
+  z-index: 1000;
+  animation: fadeInOut 3s ease;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+

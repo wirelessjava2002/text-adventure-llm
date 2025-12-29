@@ -14,7 +14,7 @@ function MainApp({ authToken }) {
   const endOfMessagesRef = useRef(null);
   const initLock = useRef(false);
   const [pendingDice, setPendingDice] = useState(null);
-
+  const [xpPopup, setXpPopup] = useState(null);
 
   const [currentPortraitIndexState, setCurrentPortraitIndex] = useState(
     currentPortraitIndex || 0
@@ -78,6 +78,15 @@ function MainApp({ authToken }) {
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+    
+  /* ---------- XP Popup ---------- */
+  useEffect(() => {
+    if (!xpPopup) return;
+
+    const timer = setTimeout(() => setXpPopup(null), 3000);
+    return () => clearTimeout(timer);
+  }, [xpPopup]);
+
 
   /* ---------- Send player input ---------- */
 
@@ -119,6 +128,21 @@ const processMessage = async (messageText) => {
       { sender: 'GM', text: response.data.narrative },
     ]);
 
+
+    // XP popup
+    if (response.data.actions) {
+      const xpAction = response.data.actions.find(
+        a => a.type === 'AWARD_XP'
+      );
+
+      if (xpAction) {
+        setXpPopup({
+          amount: xpAction.payload.amount,
+          reason: xpAction.payload.reason
+        });
+      }
+    }
+
     parseResponse(
       response.data.narrative,
       setCharacterStats,
@@ -140,36 +164,63 @@ const processMessage = async (messageText) => {
 
   /* ---------- 🎲 Dice handling  ---------- */
 
-  const handleDiceRoll = async (rolledValue) => {
-    if (!pendingDice) return;
+const handleDiceRoll = async (rolledValue) => {
+  if (!pendingDice) return;
 
-    setMessages(prev => [
-      ...prev,
-      { sender: 'Dice', text: `Rolled ${pendingDice.dice}: ${rolledValue}` }
-    ]);
+  setMessages(prev => [
+    ...prev,
+    { sender: 'Dice', text: `Rolled ${pendingDice.dice}: ${rolledValue}` }
+  ]);
 
-    const headers = {
-      'Content-Type': 'application/json',
-      'client-id': 'AppInitialization',
-    };
-
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`;
-    }
-
-    setPendingDice(null); // clear UI state
-
-    await axios.post(
-      process.env.REACT_APP_BACKEND_API_URL,
-      {
-        event: 'DICE_RESULT',
-        dice: pendingDice.dice,
-        result: rolledValue,
-        reason: pendingDice.reason
-      },
-      { headers }
-    );
+  const headers = {
+    'Content-Type': 'application/json',
+    'client-id': 'AppInitialization',
   };
+
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`;
+  }
+
+  const response = await axios.post(
+    process.env.REACT_APP_BACKEND_API_URL,
+    {
+      event: 'DICE_RESULT',
+      dice: pendingDice.dice,
+      result: rolledValue,
+      reason: pendingDice.reason
+    },
+    { headers }
+  );
+
+  setPendingDice(null); // resume normal play
+
+  // ✅ THIS IS THE MISSING PART
+  setMessages(prev => [
+    ...prev,
+    { sender: 'GM', text: response.data.narrative }
+  ]);
+
+    if (response.data.actions) {
+    const xpAction = response.data.actions.find(
+      a => a.type === 'AWARD_XP'
+    );
+
+    if (xpAction) {
+      setXpPopup({
+        amount: xpAction.payload.amount,
+        reason: xpAction.payload.reason
+      });
+    }
+  }
+
+  // XP / stat parsing happens here
+  parseResponse(
+    response.data.narrative,
+    setCharacterStats,
+    characterStatsState
+  );
+};
+
 
 
   /* ---------- Input handlers ---------- */
@@ -189,12 +240,20 @@ const processMessage = async (messageText) => {
 
   return (
     <div className="App">
+      {xpPopup && (
+        <div className="xp-popup">
+          ⭐ +{xpPopup.amount} XP
+          <br />
+          <small>{xpPopup.reason}</small>
+        </div>
+      )}
       <div className="left-panel">
         <Character
           characterStats={characterStatsState}
           setCharacterStats={setCharacterStats}
           currentPortraitIndex={currentPortraitIndexState}
           onDiceRoll={handleDiceRoll}
+          pendingDice={pendingDice}
         />
       </div>
 
@@ -233,16 +292,31 @@ const processMessage = async (messageText) => {
           <div ref={endOfMessagesRef} />
         </div>
 
+        {pendingDice && (
+          <div className="dice-prompt">
+            <p>
+              🎲 <strong>Roll {pendingDice.dice}</strong>
+              <br />
+              <em>{pendingDice.reason}</em>
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="input-form">
           <input
             type="text"
             value={input}
             onChange={handleInputChange}
-            placeholder="What do you do?"
+            placeholder={
+              pendingDice ? 'Roll the dice to continue...' : 'What do you do?'
+            }
+            disabled={!!pendingDice}
             required
             className="input-box"
           />
-          <button type="submit">Send</button>
+          <button type="submit" disabled={!!pendingDice}>
+            Send
+          </button>
         </form>
       </div>
     </div>

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"text-adventure-llm/internal/memory"
 	"text-adventure-llm/internal/protocol"
 )
 
@@ -13,19 +14,35 @@ const modelName = "@cf/meta/llama-3.1-8b-instruct"
 func HandleChat(req ChatRequest) (ChatResponse, error) {
 	log.Println("🔥 HandleChat invoked")
 
-	// 🎲 DICE GAP: resume after dice roll
+	// =========================================================
+	// 🎲 DICE GAP — resume AFTER a dice roll
+	// =========================================================
 	if req.Event == "DICE_RESULT" {
-		log.Printf("🎲 Dice result received: %s = %d (%s)\n",
-			req.Dice, req.Result, req.Reason)
+		log.Printf(
+			"🎲 Dice result received: %s = %d (%s)\n",
+			req.Dice, req.Result, req.Reason,
+		)
 
-		finalPrompt := DungeonMasterSystemPrompt +
-			"\n\nSYSTEM EVENT:\n" +
+		// STEP 5️⃣ — record dice result as SYSTEM memory
+		memory.AddTurn(
+			"System",
 			fmt.Sprintf(
 				"Dice roll result: %d (%s) for %s",
 				req.Result,
 				req.Dice,
 				req.Reason,
-			)
+			),
+		)
+
+		// Build prompt with rolling context
+		context := memory.GetContext()
+
+		promptBuilder := DungeonMasterSystemPrompt + "\n\n"
+		for _, turn := range context {
+			promptBuilder += turn.Role + ": " + turn.Content + "\n"
+		}
+
+		finalPrompt := promptBuilder
 
 		raw, err := CallCloudflare(finalPrompt)
 		if err != nil {
@@ -51,20 +68,34 @@ func HandleChat(req ChatRequest) (ChatResponse, error) {
 			}, nil
 		}
 
+		// STEP 4️⃣ — record GM narrative AFTER dice outcome
+		memory.AddTurn("GM", llmResp.Narrative)
+
 		return ChatResponse{
 			Narrative: llmResp.Narrative,
-			Actions:   []protocol.GameAction{}, // dice already resolved
+			Actions:   []protocol.GameAction{},
 			ModelUsed: modelName,
 		}, nil
 	}
 
-	// 🧠 NORMAL CHAT FLOW
+	// =========================================================
+	// 🧠 NORMAL CHAT FLOW (player input)
+	// =========================================================
 	if req.Input == "" {
 		return ChatResponse{}, fmt.Errorf("empty input")
 	}
 
-	finalPrompt := DungeonMasterSystemPrompt +
-		"\n\nPlayer: " + req.Input
+	// STEP 4️⃣ — record Player input BEFORE calling LLM
+	memory.AddTurn("Player", req.Input)
+
+	context := memory.GetContext()
+
+	promptBuilder := DungeonMasterSystemPrompt + "\n\n"
+	for _, turn := range context {
+		promptBuilder += turn.Role + ": " + turn.Content + "\n"
+	}
+
+	finalPrompt := promptBuilder
 
 	raw, err := CallCloudflare(finalPrompt)
 	if err != nil {
@@ -90,19 +121,24 @@ func HandleChat(req ChatRequest) (ChatResponse, error) {
 		}, nil
 	}
 
-	// ✅ Always return narrative
+	// STEP 4️⃣ — record GM narrative
+	memory.AddTurn("GM", llmResp.Narrative)
+
+	// Prepare response
 	response := ChatResponse{
 		Narrative: llmResp.Narrative,
 		Actions:   []protocol.GameAction{},
 		ModelUsed: modelName,
 	}
 
-	// 🔍 Filter actions
+	// =========================================================
+	// 🎯 Action filtering / Dice request pause
+	// =========================================================
 	for _, action := range llmResp.Actions {
 		switch action.Type {
 
 		case protocol.ActionRequestDiceRoll:
-			// 🔒 Pause turn, wait for dice
+			// 🔒 Pause turn — do NOT record GM twice
 			return ChatResponse{
 				Narrative: llmResp.Narrative,
 				Actions:   []protocol.GameAction{action},
