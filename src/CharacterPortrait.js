@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './CharacterCreation.css'; 
 
-const CharacterPortrait = ({ totalPortraits = 14 }) => {
-    const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0); // State for current portrait index
+const CharacterPortrait = ({ currentPortraitIndex, setCurrentPortraitIndex, totalPortraits = 14, editable = false }) => {
 
     // Function to change the portrait
     const changePortrait = (direction) => {
@@ -22,10 +21,12 @@ const CharacterPortrait = ({ totalPortraits = 14 }) => {
                 alt={`Character Portrait ${currentPortraitIndex + 1}`} 
                 className="portrait-image"
             />
-            <div className="portrait-navigation">
-                <button onClick={() => changePortrait('left')}>&lt; Previous</button>
-                <button onClick={() => changePortrait('right')}>Next &gt;</button>
-            </div>
+            {editable && (
+                <div className="portrait-navigation">
+                    <button onClick={() => changePortrait('left')}>&lt; Previous</button>
+                    <button onClick={() => changePortrait('right')}>Next &gt;</button>
+                </div>
+            )}
         </div>
     );
 };

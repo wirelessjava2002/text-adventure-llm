@@ -15,6 +15,7 @@ function MainApp({ authToken }) {
   const initLock = useRef(false);
   const [pendingDice, setPendingDice] = useState(null);
   const [xpPopup, setXpPopup] = useState(null);
+  const [responseActions, setResponseActions] = useState([]);
 
   const [currentPortraitIndexState, setCurrentPortraitIndex] = useState(
     currentPortraitIndex || 0
@@ -37,6 +38,26 @@ function MainApp({ authToken }) {
       level: 1,
     }
   );
+
+  const applyXP = (amount) => {
+    setCharacterStats(prev => ({
+      ...prev,
+      experiencePoints: (prev.experiencePoints || 0) + amount
+    }));
+  };
+
+  const handleXPFromActions = (actions = []) => {
+    actions.forEach(action => {
+      if (action.type === 'AWARD_XP') {
+        applyXP(action.payload.amount);
+        setXpPopup({
+          amount: action.payload.amount,
+          reason: action.payload.reason
+        });
+      }
+    });
+  };
+
 
   /* ---------- Initial game start ---------- */
 
@@ -92,6 +113,7 @@ function MainApp({ authToken }) {
 
 const processMessage = async (messageText) => {
   setMessages(prev => [...prev, { sender: 'User', text: messageText }]);
+  setResponseActions([]);
 
   try {
     const headers = {
@@ -108,6 +130,8 @@ const processMessage = async (messageText) => {
       { input: messageText },
       { headers }
     );
+    console.log("BACKEND ACTIONS:", response.data.actions);
+    setResponseActions(response.data.actions || []);
 
     // 🎲 Dice GAP: backend is pausing for a roll
     if (response.data.actions?.[0]?.type === 'REQUEST_DICE_ROLL') {
@@ -130,18 +154,7 @@ const processMessage = async (messageText) => {
 
 
     // XP popup
-    if (response.data.actions) {
-      const xpAction = response.data.actions.find(
-        a => a.type === 'AWARD_XP'
-      );
-
-      if (xpAction) {
-        setXpPopup({
-          amount: xpAction.payload.amount,
-          reason: xpAction.payload.reason
-        });
-      }
-    }
+    handleXPFromActions(response.data.actions);
 
     parseResponse(
       response.data.narrative,
@@ -149,13 +162,16 @@ const processMessage = async (messageText) => {
       characterStatsState
     );
 
+    handleXPFromActions(response.data.actions);
+
+
   } catch (error) {
     console.error('Error communicating with backend:', error);
     setMessages(prev => [
       ...prev,
       {
         sender: 'GM',
-        text: '⚠️ LLM JSON parse failed. Check logs.',
+        text: '⚠️ Error communicating with backend: ' + error,
       },
     ]);
   }
@@ -192,26 +208,14 @@ const handleDiceRoll = async (rolledValue) => {
     { headers }
   );
 
+  setResponseActions(response.data.actions || []);
+
   setPendingDice(null); // resume normal play
 
-  // ✅ THIS IS THE MISSING PART
   setMessages(prev => [
     ...prev,
     { sender: 'GM', text: response.data.narrative }
   ]);
-
-    if (response.data.actions) {
-    const xpAction = response.data.actions.find(
-      a => a.type === 'AWARD_XP'
-    );
-
-    if (xpAction) {
-      setXpPopup({
-        amount: xpAction.payload.amount,
-        reason: xpAction.payload.reason
-      });
-    }
-  }
 
   // XP / stat parsing happens here
   parseResponse(
@@ -219,9 +223,11 @@ const handleDiceRoll = async (rolledValue) => {
     setCharacterStats,
     characterStatsState
   );
+
+  handleXPFromActions(response.data.actions);
+
+
 };
-
-
 
   /* ---------- Input handlers ---------- */
 
@@ -292,6 +298,25 @@ const handleDiceRoll = async (rolledValue) => {
           <div ref={endOfMessagesRef} />
         </div>
 
+        {!pendingDice && responseActions.length > 0 && (
+          <div className="suggestions">
+            {responseActions
+              .filter(a => a.type === 'SUGGEST_ACTION')
+              .map((action, index) => (
+                <button
+                  key={index}
+                  className="suggestion-button"
+                  onClick={() => {
+                    setResponseActions([]);
+                    processMessage(action.payload.input);
+                  }}
+                >
+                  {action.payload.label}
+                </button>
+              ))}
+          </div>
+        )}
+
         {pendingDice && (
           <div className="dice-prompt">
             <p>
@@ -308,14 +333,14 @@ const handleDiceRoll = async (rolledValue) => {
             value={input}
             onChange={handleInputChange}
             placeholder={
-              pendingDice ? 'Roll the dice to continue...' : 'What do you do?'
+              pendingDice ? 'Roll the dice to continue...' : 'Type your request?'
             }
             disabled={!!pendingDice}
             required
             className="input-box"
           />
           <button type="submit" disabled={!!pendingDice}>
-            Send
+            Reply
           </button>
         </form>
       </div>

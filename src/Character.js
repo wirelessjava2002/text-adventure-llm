@@ -7,25 +7,6 @@ const Character = ({ characterStats, setCharacterStats, onDiceRoll, pendingDice 
   const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0);
   const totalPortraits = 14;
 
-  /* ---------------------
-     Ability Score Reroll
-     --------------------- */
-  const rollStats = () => {
-    const newStats = {
-      strength: Math.floor(Math.random() * 16) + 5,
-      dexterity: Math.floor(Math.random() * 16) + 5,
-      constitution: Math.floor(Math.random() * 16) + 5,
-      intelligence: Math.floor(Math.random() * 16) + 5,
-      wisdom: Math.floor(Math.random() * 16) + 5,
-      charisma: Math.floor(Math.random() * 16) + 5,
-    };
-
-    setCharacterStats((prev) => ({
-      ...prev,
-      ...newStats,
-    }));
-  };
-
   /* -------------------------
      Portrait Navigation
      ------------------------- */
@@ -101,9 +82,6 @@ const Character = ({ characterStats, setCharacterStats, onDiceRoll, pendingDice 
             <li><strong>WIS:</strong> {characterStats.wisdom}</li>
             <li><strong>CHA:</strong> {characterStats.charisma}</li>
           </ul>
-          <button onClick={rollStats} className="reroll-button">
-            Re-roll Stats
-          </button>
         </div>
 
         {/* COLUMN 2: Dice Roller */}

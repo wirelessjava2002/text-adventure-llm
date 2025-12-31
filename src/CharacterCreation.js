@@ -1,97 +1,174 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import CharacterPortrait from './CharacterPortrait';
-import './CharacterCreation.css'; 
+import DiceComponent from './DiceComponent';
+import './CharacterCreation.css';
+
+const rollStat = () =>
+  Math.floor(Math.random() * 6 + 1) +
+  Math.floor(Math.random() * 6 + 1) +
+  Math.floor(Math.random() * 6 + 1);
+
+const rollAllStats = () => ({
+  strength: rollStat(),
+  dexterity: rollStat(),
+  constitution: rollStat(),
+  intelligence: rollStat(),
+  wisdom: rollStat(),
+  charisma: rollStat(),
+});
+
 
 const CharacterCreation = () => {
-    const navigate = useNavigate(); // Initialize useNavigate
-    const [characterStats, setCharacterStats] = useState({
+    const navigate = useNavigate();
+    const [pendingStat, setPendingStat] = useState(null);
+    const [rolledStats, setRolledStats] = useState({});
+    const [characterStats, setCharacterStats] = useState(() => ({
         name: 'Adventurer',
-        strength: 10,
-        dexterity: 10,
-        constitution: 10,
-        intelligence: 10,
-        wisdom: 10,
-        charisma: 10,
+        ...rollAllStats(),
         armorClass: 10,
         initiative: 0,
         hitPoints: 10,
-        hitDie: "1d8",
+        hitDie: '1d8',
         experiencePoints: 0,
-        level: 1
+        level: 1,
+    }));
+
+  const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCharacterStats(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+    const handleStatRoll = (value) => {
+    if (!pendingStat) return;
+
+    setCharacterStats(prev => ({
+        ...prev,
+        [pendingStat]: value,
+    }));
+
+    setRolledStats(prev => ({
+        ...prev,
+        [pendingStat]: true,
+    }));
+
+    setPendingStat(null);
+    };
+
+
+    const rerollAllStats = () => {
+    setCharacterStats(prev => ({
+        ...prev,
+        strength: rollStat(),
+        dexterity: rollStat(),
+        constitution: rollStat(),
+        intelligence: rollStat(),
+        wisdom: rollStat(),
+        charisma: rollStat(),
+    }));
+
+    setRolledStats({});     // 🔓 re-enable all roll buttons
+    setPendingStat(null);  // 🧹 safety reset
+    };
+
+
+  const beginAdventure = () => {
+    navigate('/main', {
+      state: {
+        characterStats,
+        currentPortraitIndex,
+      },
     });
-    const [currentPortraitIndex, setCurrentPortraitIndex] = useState(0); // State for current portrait index
+  };
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setCharacterStats((prevStats) => ({
-            ...prevStats,
-            [name]: value
-        }));
-    };
+  return (
+    <div className="character-creation-container">
+      <div className="middle-section">
+        <h1 className="creation-title">Create Your Character</h1>
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        console.log('Character Created:', characterStats);
-        // Here you can handle the character creation logic, such as saving to a database or navigating to another page
-    };
+        <CharacterPortrait
+          currentPortraitIndex={currentPortraitIndex}
+          setCurrentPortraitIndex={setCurrentPortraitIndex}
+          totalPortraits={14}
+          editable={true}
+        />
 
-    const navigateToMainApp = () => {
-        navigate('/main', { state: { characterStats, currentPortraitIndex } }); // Pass character stats and portrait index as state
-    };
+        <div className="character-form">
+          <label className="name-label">Name</label>
+          <input
+            type="text"
+            name="name"
+            value={characterStats.name}
+            onChange={handleInputChange}
+            className="name-input"
+          />
 
-    const rollStats = () => {
-        const newStats = {
-            strength: Math.floor(Math.random() * 16) + 5,
-            dexterity: Math.floor(Math.random() * 16) + 5,
-            constitution: Math.floor(Math.random() * 16) + 5,
-            intelligence: Math.floor(Math.random() * 16) + 5,
-            wisdom: Math.floor(Math.random() * 16) + 5,
-            charisma: Math.floor(Math.random() * 16) + 5,
-        };
+          <div className="ability-scores">
+            <h3>Ability Scores (3d6)</h3>
+                <ul className="stat-list">
+                {[
+                    "strength",
+                    "dexterity",
+                    "constitution",
+                    "intelligence",
+                    "wisdom",
+                    "charisma"
+                ].map(stat => (
+                    <li key={stat} className="stat-row">
+                    <span className="stat-name">
+                        {stat.charAt(0).toUpperCase() + stat.slice(1)}
+                    </span>
 
-        setCharacterStats((prevStats) => ({
-            ...prevStats,
-            ...newStats,
-        }));
-    };
+                    <span className="stat-value">
+                        {characterStats[stat]}
+                    </span>
 
-    return (
-        <div className="character-creation-container">
-            <div className="left-section"> {/* Left Section */} </div>
-            <div className="middle-section"> {/* Middle Section */}
-                <h1>Create Your Character</h1>
-                <CharacterPortrait totalPortraits={14} />
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>Name:</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={characterStats.name}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-                    <div className="ability-scores">
-                        <h3>Ability Scores</h3>
-                        <ul>
-                            <li><strong>Strength:</strong> {characterStats.strength}</li>
-                            <li><strong>Dexterity:</strong> {characterStats.dexterity}</li>
-                            <li><strong>Constitution:</strong> {characterStats.constitution}</li>
-                            <li><strong>Intelligence:</strong> {characterStats.intelligence}</li>
-                            <li><strong>Wisdom:</strong> {characterStats.wisdom}</li>
-                            <li><strong>Charisma:</strong> {characterStats.charisma}</li>
-                            <p><strong>Experience:</strong> {characterStats.experiencePoints}</p>
-                        </ul>
-                        <button onClick={rollStats} className="roll-stats-button small-button">ReRoll</button>
-                    </div>
-                </form>
-                <button onClick={navigateToMainApp}>Save & Continue</button> {/* Button to navigate */}
+                    <button
+                        className="stat-roll-button"
+                        disabled={rolledStats[stat] || pendingStat !== null}
+                        onClick={() => setPendingStat(stat)}
+                    >
+                        🎲 Roll
+                    </button>
+                    </li>
+                ))}
+                </ul>
+
+            {pendingStat && (
+            <div className="dice-roll-area">
+                <p>
+                🎲 Rolling 3d6 for <strong>{pendingStat.toUpperCase()}</strong>
+                </p>
+                <DiceComponent
+                dice="3d6"
+                onLocalRoll={handleStatRoll}
+                />
             </div>
-            <div className="right-section"> {/* Right Section */} </div>
+            )}
+
+            <button
+              className="themed-button secondary"
+              onClick={rerollAllStats}
+            >
+              🔄 Re-roll Fate
+            </button>
+          </div>
+
+          <button
+            className="themed-button primary"
+            onClick={beginAdventure}
+          >
+            ⚔️ Begin Adventure
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default CharacterCreation;

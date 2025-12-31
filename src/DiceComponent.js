@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import DiceBox from "@3d-dice/dice-box";
 
-const DiceComponent = ({ onDiceRoll }) => {
+
+const DiceComponent = ({ onDiceRoll, onLocalRoll, dice = "1d20"  }) => {
   const diceBoxRef = useRef(null);
   const [rolledValue, setRolledValue] = useState(null);
   const initializedRef = useRef(false);
@@ -25,34 +26,63 @@ const DiceComponent = ({ onDiceRoll }) => {
       });
 
     dice.onRollComplete = (rollResult) => {
-      // Extract_numeric_value (your existing logic)
-      const firstRoll = rollResult?.[0];
-      const newValue = firstRoll?.rolls?.[0]?.value;
+      const firstGroup = rollResult?.[0];
+      if (!firstGroup?.rolls?.length) return;
 
-      if (newValue == null) return;
+      // 🎲 Sum ALL dice (supports 3d6, 1d20, etc.)
+      const total = firstGroup.rolls.reduce(
+        (sum, roll) => sum + roll.value,
+        0
+      );
 
       const now = Date.now();
 
       // ---- DEDUPE LOGIC ----
       const last = lastRollRef.current;
-      const isDuplicateValue = last.value === newValue;
-      const isTooSoon = now - last.ts < 300;   // 300ms dedupe window
+      const isDuplicateValue = last.value === total;
+      const isTooSoon = now - last.ts < 300;
 
       if (isDuplicateValue && isTooSoon) {
-        console.log("IGNORED DUPLICATE DICE EVENT:", newValue);
-        return; // 💥 Prevent double-processing
+        console.log("IGNORED DUPLICATE DICE EVENT:", total);
+        return;
       }
 
-      // Store this event
-      lastRollRef.current = { value: newValue, ts: now };
+      lastRollRef.current = { value: total, ts: now };
 
-      // ---- Process legitimate roll ----
-      console.log("ACCEPTED DICE EVENT:", newValue);
+      console.log(
+        "ACCEPTED DICE EVENT:",
+        total,
+        "(dice:",
+        firstGroup.rolls.map(r => r.value).join(","),
+        ")"
+      );
 
-      setRolledValue(newValue);
-      onDiceRoll(newValue);
+      setRolledValue(total);
+
+      // 🔀 LOCAL vs GAP MODE
+      if (onLocalRoll) {
+        onLocalRoll(total);   // Character creation
+      } else if (onDiceRoll) {
+        onDiceRoll(total);    // Main game (Dice GAP)
+      }
+
+      // 🟡 Start fade after 4s
+      setTimeout(() => {
+        const el = document.getElementById("dice-canvas");
+        if (el) el.classList.add("fade-out");
+      }, 4000);
+
+      // 🔴 Clear + hide after fade completes
+      setTimeout(() => {
+        dice.clear();
+        dice.hide();
+
+        const el = document.getElementById("dice-canvas");
+        if (el) el.classList.remove("fade-out");
+      }, 5000);
     };
-      
+
+
 
       return dice.init().then(() => {
         console.log("DiceBox initialized!");
@@ -79,7 +109,7 @@ const DiceComponent = ({ onDiceRoll }) => {
     if (diceBoxRef.current) {
       console.log("Rolling the dice..."); 
       diceBoxRef.current.show();
-      diceBoxRef.current.roll("1d20");
+      diceBoxRef.current.roll(dice);
     } else {
       console.error("DiceBox is not initialized.");
     }

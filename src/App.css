@@ -96,8 +96,8 @@ html, body {
 }
 
 .portrait-image {
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   border: 2px solid #5a4636;
   object-fit: cover;
   margin-bottom: 10px;
@@ -148,6 +148,7 @@ button:hover {
   overflow: hidden !important;
 }
 
+
 /* DiceBox injects a canvas with its own ID */
 #dice-canvas {
   position: absolute !important;
@@ -157,8 +158,13 @@ button:hover {
   height: 100% !important;
   display: block !important;
   pointer-events: none !important;
+  opacity: 1;                     /* fade out */
+  transition: opacity 1s ease;  /* fade out */
 }
 
+#dice-box.fade-out {
+  opacity: 0;
+}
 /* ========= LEFT CHARACTER PANEL ========== */
 
 .character-panel {
@@ -265,4 +271,25 @@ button:hover {
   90% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-10px); }
 }
+
+.suggestions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.suggestion-button {
+  background: #333;
+  color: #6183ff;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.suggestion-button:hover {
+  background: #555;
+}
+
 
